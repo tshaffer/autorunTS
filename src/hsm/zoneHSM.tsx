@@ -48,10 +48,10 @@ export class ZoneHSM extends HSM {
     this.id = this.bsdmZone.id;
     this.name = this.bsdmZone.name;
 
-    this.x = this.bsdmZone.absolutePosition.x;
-    this.y = this.bsdmZone.absolutePosition.y;
-    this.width = this.bsdmZone.absolutePosition.width;
-    this.height = this.bsdmZone.absolutePosition.height;
+    this.x = this.bsdmZone.position.x;
+    this.y = this.bsdmZone.position.y;
+    this.width = this.bsdmZone.position.width;
+    this.height = this.bsdmZone.position.height;
 
     this.initialMediaStateId = this.bsdmZone.initialMediaStateId;
     this.mediaStateIds = dmGetZoneSimplePlaylist(this.bsdm, { id: zoneId });

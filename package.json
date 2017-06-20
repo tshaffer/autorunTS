@@ -10,8 +10,8 @@
   "author": "Ted Shaffer",
   "license": "ISC",
   "dependencies": {
-    "@brightsign/bscore": "0.1.7",
-    "@brightsign/bsdatamodel": "0.5.4",
+    "@brightsign/bscore": "^0.1.9",
+    "@brightsign/bsdatamodel": "0.5.5",
     "@types/electron": "^1.4.37",
     "@types/react": "^15.0.24",
     "@types/react-dom": "^15.5.0",

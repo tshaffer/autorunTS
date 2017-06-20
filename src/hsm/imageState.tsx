@@ -1,5 +1,5 @@
 import {
-    DmMediaStateState,
+    DmcMediaState,
     DmState,
 } from '@brightsign/bsdatamodel';
 
@@ -19,12 +19,12 @@ import {
 export default class ImageState extends HState {
 
     bsdm : DmState;
-    bsdmImageState : DmMediaStateState;
+    bsdmImageState : DmcMediaState;
     nextState : HState;
     dispatch : Function;
     stateMachine : ZoneHSM;
 
-    constructor(zoneHSM : ZoneHSM, bsdmImageState : DmMediaStateState ) {
+    constructor(zoneHSM : ZoneHSM, bsdmImageState : DmcMediaState ) {
 
         super(zoneHSM, bsdmImageState.id);
         this.bsdm = zoneHSM.bsdm;

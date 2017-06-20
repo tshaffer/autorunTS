@@ -4,7 +4,7 @@ import {
 
 import {
   BsDmId,
-  DmMediaStateState,
+  DmcMediaState,
   dmGetZoneById,
   dmGetZoneSimplePlaylist,
   dmGetMediaStateById,
@@ -17,6 +17,7 @@ import {
 import ImageState from './imageState';
 import VideoState from './videoState';
 import MRSSDataFeedState from './mrssDataFeedState';
+import HtmlTableState from './htmlTableState';
 
 export class MediaZoneHSM extends ZoneHSM {
 
@@ -35,10 +36,10 @@ export class MediaZoneHSM extends ZoneHSM {
     this.id = this.bsdmZone.id;
     this.name = this.bsdmZone.name;
 
-    this.x = this.bsdmZone.absolutePosition.x;
-    this.y = this.bsdmZone.absolutePosition.y;
-    this.width = this.bsdmZone.absolutePosition.width;
-    this.height = this.bsdmZone.absolutePosition.height;
+    this.x = this.bsdmZone.position.x;
+    this.y = this.bsdmZone.position.y;
+    this.width = this.bsdmZone.position.width;
+    this.height = this.bsdmZone.position.height;
 
     this.initialMediaStateId = this.bsdmZone.initialMediaStateId;
     this.mediaStateIds = dmGetZoneSimplePlaylist(this.bsdm, { id: zoneId });
@@ -46,13 +47,15 @@ export class MediaZoneHSM extends ZoneHSM {
 
     let newState : MediaHState = null;
     this.mediaStateIds.forEach( (mediaStateId : BsDmId, index : number) => {
-      const bsdmMediaState : DmMediaStateState = dmGetMediaStateById(this.bsdm, { id : mediaStateId});
+      const bsdmMediaState: DmcMediaState = dmGetMediaStateById(this.bsdm, {id: mediaStateId});
       if (bsdmMediaState.contentItem.type === 'Image') {
         newState = new ImageState(this, bsdmMediaState);
       } else if (bsdmMediaState.contentItem.type === 'Video') {
         newState = new VideoState(this, bsdmMediaState);
       } else if (bsdmMediaState.contentItem.type === 'MrssFeed') {
         newState = new MRSSDataFeedState(this, bsdmMediaState);
+      } else if (bsdmMediaState.contentItem.type === 'VideoStream') {
+        newState = new HtmlTableState(this, bsdmMediaState);
       }
 
       this.mediaStates.push(newState);

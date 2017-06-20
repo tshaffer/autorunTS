@@ -11,6 +11,7 @@ import {
 import ImageContainer from '../containers/imageContainer';
 import VideoContainer from '../containers/videoContainer';
 import MrssDisplayItemContainer from '../containers/mrssDisplayItemContainer';
+import HtmlTableContainer from '../containers/htmlTableContainer';
 
 import { getPoolFilePath } from '../utilities/utilities';
 
@@ -26,11 +27,11 @@ import {
 
 import {
   BsDmId,
+  DmcMediaState,
   DmDataFeedContentItem,
   DmDerivedContentItem,
   DmMediaContentItem,
   DmEvent,
-  DmMediaStateState,
   DmState,
   dmGetMediaStateById,
   dmGetEventIdsForMediaState,
@@ -55,7 +56,7 @@ export default class MediaZone extends React.Component<MediaZoneStateProps & Med
     this.props.postBSPMessage(event);
   }
 
-  renderMediaItem(mediaState : DmMediaStateState, contentItem: DmDerivedContentItem, event : DmEvent) {
+  renderMediaItem(mediaState : DmcMediaState, contentItem: DmDerivedContentItem, event : DmEvent) {
 
     let duration : number = 10;
 
@@ -114,6 +115,15 @@ export default class MediaZone extends React.Component<MediaZoneStateProps & Med
     }
   }
 
+  renderHtmlTable(contentItem: DmDerivedContentItem) {
+    return (
+      <HtmlTableContainer
+        width={this.props.width}
+        height={this.props.height}
+      />
+    );
+  }
+
   renderMrssItem(mrssContentItem : DmDataFeedContentItem) {
 
     const duration : number = 3;
@@ -159,7 +169,7 @@ export default class MediaZone extends React.Component<MediaZoneStateProps & Med
     }
 
     const mediaStateId : string = this.props.activeMediaStateId;
-    const mediaState : DmMediaStateState = dmGetMediaStateById(this.props.bsdm, { id : mediaStateId });
+    const mediaState : DmcMediaState = dmGetMediaStateById(this.props.bsdm, { id : mediaStateId });
 
     const event : DmEvent = this.getEvent(this.props.bsdm, mediaState.id);
     const contentItem : DmDerivedContentItem = mediaState.contentItem;
@@ -169,6 +179,8 @@ export default class MediaZone extends React.Component<MediaZoneStateProps & Med
       case 'Image': {
         return this.renderMediaItem(mediaState, contentItem as DmMediaContentItem, event);
       }
+      case 'VideoStream':
+        return this.renderHtmlTable(contentItem);
       case 'MrssFeed': {
         return this.renderMrssItem(contentItem as DmDataFeedContentItem);
       }
