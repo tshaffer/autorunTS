@@ -1,5 +1,5 @@
 import * as React from 'react';
-import Slider from 'react-slick';//TODO remove
+import Slider from 'react-slick';
 
 import path = require('path');
 import {
@@ -11,7 +11,7 @@ import {
 export interface SlickProps {
   height: number;
   width: number;
-  // filePaths: string [];
+  filePaths: string [];
   dataFeedId: BsDmId;
 }
 
@@ -34,7 +34,7 @@ export default class Slick extends React.Component<SlickProps, object> {
       dots: true,
       // infinite: true,
       // speed: 500,
-      slidesToShow: 2,
+      slidesToShow: 1,
       // slidesToScroll: 1
     };
     return (

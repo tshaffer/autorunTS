@@ -798,7 +798,7 @@ function updateAutoplayZone(bacZone : any, dispatch : Function, getState : Funct
 
     const initialMediaStateId = bacZone.playlist.states.initialState;
 
-    const addMediaStatePromises : any = addMediaStates(zoneId, bacZone, dispatch);
+    const addMediaStatePromises : Array<BsDmAction<MediaStateParams>> = addMediaStates(zoneId, bacZone, dispatch);
     Promise.all(addMediaStatePromises).then((mediaStateParamActions : Array<BsDmAction<MediaStateParams>>) => {
       addTransitions(bacZone, dispatch, getState);
       updateNames(mediaStateNamesToUpdateByMediaStateId, dispatch);

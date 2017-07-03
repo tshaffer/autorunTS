@@ -113,15 +113,6 @@ export default class MediaZone extends React.Component<MediaZoneStateProps & Med
           />
         );
       }
-      // case 'Slick': {
-      //   return (
-      //     <SlickContainer
-      //       width={this.props.width}
-      //       height={this.props.height}
-      //       src={src}
-      //       />
-      //   );
-      // }
       default: {
         debugger;
       }
@@ -149,15 +140,12 @@ export default class MediaZone extends React.Component<MediaZoneStateProps & Med
 
   renderSlickItem(slickItem : DmDataFeedContentItem) {
 
-    // src={'http://placekitten.com/g/400/200'}
-
-    const dataFeedId : string = slickItem.dataFeedId;
-
     return (
       <SlickContainer
         width={this.props.width}
         height={this.props.height}
-        dataFeedId={dataFeedId}
+        dataFeedId={slickItem.dataFeedId}
+        filePaths={[]}
       />
     );
 
