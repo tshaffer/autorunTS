@@ -139,7 +139,7 @@ export class BSP {
     const rootPath = PlatformService.default.getRootDirectory();
     const pathToPool = PlatformService.default.getPathToPool();
 
-    this.importPublishedFiles = true;
+    this.importPublishedFiles = false;
 
     if (this.importPublishedFiles) {
       this.parseImportedPublishedFiles(rootPath, pathToPool).then( () => {
