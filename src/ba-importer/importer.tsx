@@ -37,6 +37,7 @@ import {
 } from '@brightsign/bsdatamodel';
 
 import {
+  DmImageContentItemData,
   DmMrssDataFeedContentItem,
   dmCreateMrssDataFeedContentItem,
   DmDataFeedContentItem,
@@ -129,10 +130,8 @@ type MediaStateIdToMediaStateName = { [mediaStateId:string]: string };
 
 interface MediaStateProperties {
   name : string;
-  mediaStateDuration : number;
   transitionType : TransitionType;
   transitionDuration : number;
-  videoPlayerRequired : boolean;
 };
 
 type MediaStateNameToMediaStateProperties = { [mediaStateName : string]: MediaStateProperties };
@@ -659,6 +658,8 @@ function addMediaStates(zoneId : BsDmId, bacZone : any, dispatch : Function) : a
     let filePath;
     let bsAssetItem : BsAssetItem;
     let contentItem : BsAssetItem | DmDerivedNonMediaContentItem;
+    let addMediaStatePromise : Promise<BsDmAction<MediaStateParams>>;
+
     if (bacMediaState.imageItem) {
 
       const bacImageItem : any = bacMediaState.imageItem;
@@ -674,13 +675,20 @@ function addMediaStates(zoneId : BsDmId, bacZone : any, dispatch : Function) : a
 
       mapBacMediaStateNameToMediaStateProps[bacMediaState.name] = {
         name : fileName,
-        mediaStateDuration,
         transitionType,
         transitionDuration,
-        videoPlayerRequired
       }
 
+      const imageContentItemData : DmImageContentItemData = {
+        useImageBuffer : false,
+        videoPlayerRequired
+      };
+
       contentItem = bsAssetItem;
+
+      addMediaStatePromise = dispatch(dmAddMediaState(bacMediaState.name, dmGetZoneMediaStateContainer(zoneId),
+        contentItem, imageContentItemData));
+
     }
     else if (bacMediaState.slickItem) {
       const bacSlickItem : any = bacMediaState.slickItem;
@@ -696,12 +704,13 @@ function addMediaStates(zoneId : BsDmId, bacZone : any, dispatch : Function) : a
       console.log(dataFeedContentItem);
 
       contentItem = dataFeedContentItem;
+
+      addMediaStatePromise = dispatch(dmAddMediaState(bacMediaState.name, dmGetZoneMediaStateContainer(zoneId), contentItem));
     }
     else if (bacMediaState.videoItem) {
       debugger;
     }
 
-    const addMediaStatePromise : Promise<BsDmAction<MediaStateParams>> = dispatch(dmAddMediaState(bacMediaState.name, dmGetZoneMediaStateContainer(zoneId), contentItem));
     addMediaStatePromises.push(addMediaStatePromise);
   });
 
@@ -759,7 +768,7 @@ function addTransitions(bacZone : any, dispatch : Function, getState : Function)
       const targetMediaState : DmcMediaState = dmGetMediaStateByName(state, { name : targetMediaStateName});
 
       const mediaStateProps : MediaStateProperties = mapBacMediaStateNameToMediaStateProps[sourceMediaState.name];
-      const { name, mediaStateDuration, transitionType, transitionDuration, videoPlayerRequired } = mediaStateProps;
+      const { name, transitionType, transitionDuration } = mediaStateProps;
       mediaStateNamesToUpdateByMediaStateId[sourceMediaState.id] = name;
 
       // TODO - what is the proper js method to convert from string to enum value, in this case EventType.Timer?
