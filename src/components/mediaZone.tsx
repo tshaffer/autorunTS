@@ -9,6 +9,7 @@ import {
 // import DesktopPlatformService from '../platform/desktop/DesktopPlatformService';
 
 import ImageContainer from '../containers/imageContainer';
+import SlickContainer from '../containers/slickContainer';
 import VideoContainer from '../containers/videoContainer';
 import MrssDisplayItemContainer from '../containers/mrssDisplayItemContainer';
 
@@ -137,16 +138,29 @@ export default class MediaZone extends React.Component<MediaZoneStateProps & Med
     );
   }
 
+  renderSlickItem(slickItem : DmDataFeedContentItem) {
+
+    return (
+      <SlickContainer
+        width={this.props.width}
+        height={this.props.height}
+        dataFeedId={slickItem.dataFeedId}
+        filePaths={[]}
+      />
+    );
+
+  }
   getEvent( bsdm : DmState, mediaStateId: string ) : DmEvent {
 
     const eventIds : BsDmId[] = dmGetEventIdsForMediaState(bsdm, { id : mediaStateId });
     if (eventIds.length !== 1) {
-      debugger;
+      console.log('no event');
+      return null;
     }
 
     const event : DmEvent = dmGetEventById(bsdm, { id : eventIds[0] });
     if (!event) {
-      debugger;
+      console.log('no event');
     }
 
     return event;
@@ -173,8 +187,11 @@ export default class MediaZone extends React.Component<MediaZoneStateProps & Med
       case 'Image': {
         return this.renderMediaItem(mediaState, contentItem as DmMediaContentItem, event);
       }
-      case 'MrssFeed': {
-        return this.renderMrssItem(contentItem as DmDataFeedContentItem);
+      // case 'MrssFeed': {
+      //   return this.renderMrssItem(contentItem as DmDataFeedContentItem);
+      // }
+      case 'MrssFeed': {  // Slick
+        return this.renderSlickItem(contentItem as DmDataFeedContentItem);
       }
       default: {
         break;

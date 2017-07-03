@@ -5,6 +5,7 @@ const StringDecoder = require('string_decoder').StringDecoder;
 const decoder = new StringDecoder('utf8');
 
 import {
+  DataFeedUsageType,
   AssetLocation,
   bscGetLocalAssetLocator,
   bscGetFileMediaType,
@@ -32,11 +33,24 @@ import {
 } from '@brightsign/bscore';
 
 import {
-  dmAddZone, dmUpdateMediaState
+  dmAddZone, DmDerivedNonMediaContentItem, dmUpdateMediaState
 } from '@brightsign/bsdatamodel';
 
 import {
   BsDmThunkAction,
+  DmImageContentItemData,
+  DmMrssDataFeedContentItem,
+  dmCreateMrssDataFeedContentItem,
+  DmDataFeedContentItem,
+  DataFeedParams,
+  dmGetParameterizedStringFromString,
+  DmDataFeed,
+  DmParameterizedString,
+  dmCreateDataFeedContentItem,
+  dmGetSimpleStringFromParameterizedString,
+  DataFeedAction,
+  dmAddDataFeed,
+  dmCreateHtmlContentItem,
   DmcMediaState,
   dmGetMediaStateByName,
   TransitionAction,
@@ -72,10 +86,14 @@ import {
   dmUpdateZoneProperties,
   ZonePropertyUpdateParams,
   VideoOrImagesZonePropertyParams,
+  dmCreateAssetItemFromLocalFile,
 } from '@brightsign/bsdatamodel';
 
 import * as Converters from './converters';
 import * as Utilities from '../utilities/utilities';
+
+import { addMediaStates } from './statesImporters';
+import { mapBacMediaStateNameToMediaStateProps } from './statesImporters';
 
 import {
   setPoolAssetFiles,
@@ -83,25 +101,6 @@ import {
 
 import ScheduledPresentation from './scheduledPresentation';
 import PresentationToSchedule from "./presentationToSchedule";
-
-export function dmCreateAssetItemFromLocalFile(
-  fullPath: string,
-  id: BsAssetId = '',
-  mediaType: MediaType = null,
-): BsAssetItem {
-  const name = fullPath.replace(/^.*[\\\/]/, '');
-  const path = fullPath.substr(0, fullPath.length - name.length);
-  return {
-    id,
-    name,
-    path,
-    networkId: 0,
-    location: AssetLocation.Local,
-    locator: bscGetLocalAssetLocator(fullPath),
-    assetType: AssetType.Content,
-    mediaType: mediaType ? mediaType : bscGetFileMediaType(name),
-  };
-}
 
 type ArFileLUT = { [fileName:string]: string };
 
@@ -135,15 +134,13 @@ type MediaStateIdToMediaStateName = { [mediaStateId:string]: string };
 
 interface MediaStateProperties {
   name : string;
-  mediaStateDuration : number;
   transitionType : TransitionType;
   transitionDuration : number;
-  videoPlayerRequired : boolean;
 };
 
 type MediaStateNameToMediaStateProperties = { [mediaStateName : string]: MediaStateProperties };
 
-let mapBacMediaStateNameToMediaStateProps : MediaStateNameToMediaStateProperties = {};
+// let mapBacMediaStateNameToMediaStateProps : MediaStateNameToMediaStateProperties = {};
 let mediaStateNamesToUpdateByMediaStateId : MediaStateIdToMediaStateName = {};
 
 // type MyProp1 = string;
@@ -156,7 +153,9 @@ let mediaStateNamesToUpdateByMediaStateId : MediaStateIdToMediaStateName = {};
 
 export function importPublishedFiles(rootPath : string, dispatch : Function, getState : Function) : Promise<ConvertedPackage> {
 
-  // let myObj : MyObj = {} as MyObj;
+  // let myObj : MyObj = {} as MyObj;   WORKS
+  // let myObj: MyObj | {} = {};        WORKS
+  // let myObj: MyObj;                  DOESNT WORK - myObj is undefined
 
   let convertedPackage : ConvertedPackage = {
     syncSpec : null,
@@ -644,87 +643,49 @@ function setZoneProperties(zoneId : BsDmId, zoneType : string, bacZone : any, di
   dispatch(dmUpdateZoneProperties(zonePropertyUpdateParams));
 }
 
-function addMediaStates(zoneId : BsDmId, bacZone : any, dispatch : Function) {
-
-  const bacStates = bacZone.playlist.states.state;
-
-  bacStates.forEach( (bacMediaState : any) => {
-
-    let fileName;
-    let filePath;
-    let bsAssetItem : BsAssetItem;
-    if (bacMediaState.imageItem) {
-
-      const bacImageItem : any = bacMediaState.imageItem;
-
-      fileName = bacImageItem.file['@name'];
-      filePath = Utilities.getPoolFilePath(fileName);
-      bsAssetItem = dmCreateAssetItemFromLocalFile(filePath, '', MediaType.Image);
-
-      const mediaStateDuration : number = Converters.stringToNumber(bacImageItem.slideDelayInterval);
-      const transitionType : TransitionType = Converters.getTransitionType(bacImageItem.slideTransition);
-      const transitionDuration : number = Converters.stringToNumber(bacImageItem.transitionDuration);
-      const videoPlayerRequired : boolean = Converters.stringToBool(bacImageItem.videoPlayerRequired);
-
-      mapBacMediaStateNameToMediaStateProps[bacMediaState.name] = {
-        name : fileName,
-        mediaStateDuration,
-        transitionType,
-        transitionDuration,
-        videoPlayerRequired
-      }
-    }
-    else if (bacMediaState.videoItem) {
-      debugger;
-    }
-
-    const addMediaStateThunk : BsDmThunkAction<MediaStateParams> = (dmAddMediaState(bacMediaState.name, dmGetZoneMediaStateContainer(zoneId), bsAssetItem));
-    const bsDmAction : BsDmAction<MediaStateParams> = dispatch(addMediaStateThunk);
-    const mediaStateParams : MediaStateParams = bsDmAction.payload;
-  });
-}
-
 function addTransitions(bacZone : any, dispatch : Function, getState : Function) {
 
   const state = getState().bsdm;
 
   const transitions = bacZone.playlist.states.transition;
 
-  transitions.forEach( (bacTransition : any) => {
-    console.log(bacTransition);
+  if (transitions) {
+    transitions.forEach( (bacTransition : any) => {
+      console.log(bacTransition);
 
-    // TODO I don't see the following 3 variables used in bsdm - ??
-    const assignInputToUserVariable : boolean = Converters.stringToBool(bacTransition.assignInputToUserVariable);
-    const assignWildcardToUserVariable : boolean = Converters.stringToBool(bacTransition.assignWildcardToUserVariable);
-    const remainOnCurrentStateActions : string = bacTransition.remainOnCurrentStateActions;
-    const sourceMediaStateName : string = bacTransition.sourceMediaState;
-    const targetMediaStateName : string = bacTransition.targetMediaState;
-    const userEvent : any = bacTransition.userEvent;
-    const userEventName : string = userEvent.name;
-    const parameters : any = userEvent.parameters;
-    const parameter : string = parameters.parameter;
-    // TODO - need code to properly convert parameters
-    const duration : number = Number(parameter);
+      // TODO I don't see the following 3 variables used in bsdm - ??
+      const assignInputToUserVariable : boolean = Converters.stringToBool(bacTransition.assignInputToUserVariable);
+      const assignWildcardToUserVariable : boolean = Converters.stringToBool(bacTransition.assignWildcardToUserVariable);
+      const remainOnCurrentStateActions : string = bacTransition.remainOnCurrentStateActions;
+      const sourceMediaStateName : string = bacTransition.sourceMediaState;
+      const targetMediaStateName : string = bacTransition.targetMediaState;
+      const userEvent : any = bacTransition.userEvent;
+      const userEventName : string = userEvent.name;
+      const parameters : any = userEvent.parameters;
+      const parameter : string = parameters.parameter;
+      // TODO - need code to properly convert parameters
+      const duration : number = Number(parameter);
 
-    // TODO - what is duration vs. mediaStateDuration? answer - they are set to the same value.
+      // TODO - what is duration vs. mediaStateDuration? answer - they are set to the same value.
 
-    const sourceMediaState : DmcMediaState = dmGetMediaStateByName(state, { name : sourceMediaStateName});
+      const sourceMediaState : DmcMediaState = dmGetMediaStateByName(state, { name : sourceMediaStateName});
 
-    const targetMediaState : DmcMediaState = dmGetMediaStateByName(state, { name : targetMediaStateName});
+      const targetMediaState : DmcMediaState = dmGetMediaStateByName(state, { name : targetMediaStateName});
 
-    const mediaStateProps : MediaStateProperties = mapBacMediaStateNameToMediaStateProps[sourceMediaState.name];
-    const { name, mediaStateDuration, transitionType, transitionDuration, videoPlayerRequired } = mediaStateProps;
-    mediaStateNamesToUpdateByMediaStateId[sourceMediaState.id] = name;
+      const mediaStateProps : MediaStateProperties = mapBacMediaStateNameToMediaStateProps[sourceMediaState.name];
+      const { name, transitionType, transitionDuration } = mediaStateProps;
+      mediaStateNamesToUpdateByMediaStateId[sourceMediaState.id] = name;
 
-    // TODO - what is the proper js method to convert from string to enum value, in this case EventType.Timer?
-    const eventAction : EventAction = dispatch(dmAddEvent(userEventName, EventType.Timer, sourceMediaState.id,
-      { interval : duration} ));
-    console.log(eventAction);
+      // TODO - what is the proper js method to convert from string to enum value, in this case EventType.Timer?
+      const eventAction : EventAction = dispatch(dmAddEvent(userEventName, EventType.Timer, sourceMediaState.id,
+        { interval : duration} ));
+      console.log(eventAction);
 
-    const transitionAction : TransitionAction = dispatch(dmAddTransition('myTransition', eventAction.payload.id,
-      targetMediaState.id, transitionType, transitionDuration));
-    console.log(transitionAction);
-  });
+      const transitionAction : TransitionAction = dispatch(dmAddTransition('myTransition', eventAction.payload.id,
+        targetMediaState.id, transitionType, transitionDuration));
+      console.log(transitionAction);
+    });
+  }
 }
 
 
@@ -739,6 +700,16 @@ function updateAutoplayZone(bacZone : any, dispatch : Function, getState : Funct
   addMediaStates(zoneId, bacZone, dispatch);
   addTransitions(bacZone, dispatch, getState);
   updateNames(mediaStateNamesToUpdateByMediaStateId, dispatch);
+/*
+  updateNames(mediaStateNamesToUpdateByMediaStateId, dispatch);
+    const addMediaStatePromises : Array<BsDmAction<MediaStateParams>> = addMediaStates(zoneId, bacZone, dispatch);
+    Promise.all(addMediaStatePromises).then((mediaStateParamActions : Array<BsDmAction<MediaStateParams>>) => {
+      addTransitions(bacZone, dispatch, getState);
+      updateNames(mediaStateNamesToUpdateByMediaStateId, dispatch);
+      resolve();
+    });
+  });
+*/
 }
 
 function updateNames(namesToUpdateById : MediaStateIdToMediaStateName, dispatch : Function){

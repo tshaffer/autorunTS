@@ -6,3 +6,11 @@ body {
 .autorunText {
     color: blue;
 }
+
+.slickContainer {
+    margin: 0 auto;
+    padding: 40px;
+    color: #333;
+    background: #419be0;
+    width: 80%;
+}

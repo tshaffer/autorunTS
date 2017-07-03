@@ -17,7 +17,8 @@ module.exports = {
   },
 
   externals: {
-    '@brightsign/videomodeconfiguration': 'commonjs @brightsign/videomodeconfiguration'
+    '@brightsign/videomodeconfiguration': 'commonjs @brightsign/videomodeconfiguration',
+    BSDeviceInfo : 'BSDeviceInfo'
   },
 
   module: {
@@ -26,6 +27,6 @@ module.exports = {
       { test: /\.tsx?$/, loader: "awesome-typescript-loader" },
 
       { enforce: "pre", test: /\.js$/, loader: "source-map-loader" }
-    ]
+    ],
   },
 };
