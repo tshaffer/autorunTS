@@ -55,9 +55,9 @@ export class MediaZoneHSM extends ZoneHSM {
         newState = new ImageState(this, bsdmMediaState);
       } else if (bsdmMediaState.contentItem.type === 'Video') {
         newState = new VideoState(this, bsdmMediaState);
+      // } else if (bsdmMediaState.contentItem.type === 'MrssFeed') {
+      //   newState = new MRSSDataFeedState(this, bsdmMediaState);
       } else if (bsdmMediaState.contentItem.type === 'MrssFeed') {
-        newState = new MRSSDataFeedState(this, bsdmMediaState);
-      } else if (bsdmMediaState.contentItem.type === 'DataFeed') {
         newState = new SlickState(this, bsdmMediaState);
       }
 

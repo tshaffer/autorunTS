@@ -187,10 +187,10 @@ export default class MediaZone extends React.Component<MediaZoneStateProps & Med
       case 'Image': {
         return this.renderMediaItem(mediaState, contentItem as DmMediaContentItem, event);
       }
-      case 'MrssFeed': {
-        return this.renderMrssItem(contentItem as DmDataFeedContentItem);
-      }
-      case 'DataFeed': {  // Slick
+      // case 'MrssFeed': {
+      //   return this.renderMrssItem(contentItem as DmDataFeedContentItem);
+      // }
+      case 'MrssFeed': {  // Slick
         return this.renderSlickItem(contentItem as DmDataFeedContentItem);
       }
       default: {

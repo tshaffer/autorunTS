@@ -32,10 +32,13 @@ export default class Slick extends React.Component<SlickProps, object> {
   render() {
     var settings = {
       dots: true,
-      // infinite: true,
+      infinite: true,
       // speed: 500,
-      slidesToShow: 2,
-      // slidesToScroll: 1
+      // slidesToShow: 2,
+      // slidesToScroll: 1,
+      autoplay : true,
+      autoplaySpeed : 2000,
+      fade : true,
     };
     return (
       <div className='slickContainer'>
@@ -44,13 +47,5 @@ export default class Slick extends React.Component<SlickProps, object> {
         </Slider>
       </div>
     );
-
-    /*
-     <div><img src='http://placekitten.com/g/400/200' /></div>
-     <div><img src='http://placekitten.com/g/400/200' /></div>
-     <div><img src='http://placekitten.com/g/400/200' /></div>
-     <div><img src='http://placekitten.com/g/400/200' /></div>
-
-     */
   }
 }

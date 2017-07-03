@@ -37,6 +37,8 @@ import {
 } from '@brightsign/bsdatamodel';
 
 import {
+  DmMrssDataFeedContentItem,
+  dmCreateMrssDataFeedContentItem,
   DmDataFeedContentItem,
   DataFeedParams,
   dmGetParameterizedStringFromString,
@@ -148,7 +150,9 @@ let mediaStateNamesToUpdateByMediaStateId : MediaStateIdToMediaStateName = {};
 
 export function importPublishedFiles(rootPath : string, dispatch : Function, getState : Function) : Promise<ConvertedPackage> {
 
-  // let myObj : MyObj = {} as MyObj;
+  // let myObj : MyObj = {} as MyObj;   WORKS
+  // let myObj: MyObj | {} = {};        WORKS
+  // let myObj: MyObj;                  DOESNT WORK - myObj is undefined
 
   let convertedPackage : ConvertedPackage = {
     syncSpec : null,
@@ -683,11 +687,12 @@ function addMediaStates(zoneId : BsDmId, bacZone : any, dispatch : Function) : a
 
       // try to fool bsdm
       const url : DmParameterizedString = dmGetParameterizedStringFromString(JSON.stringify(bacSlickItem));
-      const dataFeedAction : BsDmAction<DataFeedParams> = dmAddDataFeed(bacSlickItem.name, url, DataFeedUsageType.Text);
+      const dataFeedAction : BsDmAction<DataFeedParams> = dmAddDataFeed(bacSlickItem.name, url, DataFeedUsageType.Mrss);
       const dataFeedParamAction : BsDmAction<DataFeedParams> = dispatch(dataFeedAction);
       const dataFeedParams : DataFeedParams = dataFeedParamAction.payload;
       const dataFeedId : BsDmId = dataFeedParams.id;
-      const dataFeedContentItem : DmDataFeedContentItem = dmCreateDataFeedContentItem(bacSlickItem.name, dataFeedId);
+      // const dataFeedContentItem : DmDataFeedContentItem = dmCreateDataFeedContentItem(bacSlickItem.name, dataFeedId);
+      const dataFeedContentItem : DmMrssDataFeedContentItem = dmCreateMrssDataFeedContentItem(bacSlickItem.name, dataFeedId);
       console.log(dataFeedContentItem);
 
       contentItem = dataFeedContentItem;
