@@ -8,6 +8,7 @@ import {
   dmGetZoneById,
   dmGetZoneSimplePlaylist,
   dmGetMediaStateById,
+  dmGetMediaStateIdsForZone,
 } from '@brightsign/bsdatamodel';
 
 import {
@@ -17,6 +18,8 @@ import {
 import ImageState from './imageState';
 import VideoState from './videoState';
 import MRSSDataFeedState from './mrssDataFeedState';
+import SlickState from './slickState';
+import Slick from "../components/slick";
 
 export class MediaZoneHSM extends ZoneHSM {
 
@@ -41,7 +44,8 @@ export class MediaZoneHSM extends ZoneHSM {
     this.height = this.bsdmZone.position.height;
 
     this.initialMediaStateId = this.bsdmZone.initialMediaStateId;
-    this.mediaStateIds = dmGetZoneSimplePlaylist(this.bsdm, { id: zoneId });
+    // this.mediaStateIds = dmGetZoneSimplePlaylist(this.bsdm, { id: zoneId });
+    this.mediaStateIds = dmGetMediaStateIdsForZone(this.bsdm, { id: zoneId });
     this.mediaStates = [];
 
     let newState : MediaHState = null;
@@ -53,6 +57,8 @@ export class MediaZoneHSM extends ZoneHSM {
         newState = new VideoState(this, bsdmMediaState);
       } else if (bsdmMediaState.contentItem.type === 'MrssFeed') {
         newState = new MRSSDataFeedState(this, bsdmMediaState);
+      } else if (bsdmMediaState.contentItem.type === 'DataFeed') {
+        newState = new SlickState(this, bsdmMediaState);
       }
 
       this.mediaStates.push(newState);

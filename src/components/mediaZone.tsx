@@ -113,15 +113,15 @@ export default class MediaZone extends React.Component<MediaZoneStateProps & Med
           />
         );
       }
-      case 'Slick': {
-        return (
-          <SlickContainer
-            width={this.props.width}
-            height={this.props.height}
-            src={src}
-            />
-        );
-      }
+      // case 'Slick': {
+      //   return (
+      //     <SlickContainer
+      //       width={this.props.width}
+      //       height={this.props.height}
+      //       src={src}
+      //       />
+      //   );
+      // }
       default: {
         debugger;
       }
@@ -147,16 +147,32 @@ export default class MediaZone extends React.Component<MediaZoneStateProps & Med
     );
   }
 
+  renderSlickItem(slickItem : DmDataFeedContentItem) {
+
+    // src={'http://placekitten.com/g/400/200'}
+
+    const dataFeedId : string = slickItem.dataFeedId;
+
+    return (
+      <SlickContainer
+        width={this.props.width}
+        height={this.props.height}
+        dataFeedId={dataFeedId}
+      />
+    );
+
+  }
   getEvent( bsdm : DmState, mediaStateId: string ) : DmEvent {
 
     const eventIds : BsDmId[] = dmGetEventIdsForMediaState(bsdm, { id : mediaStateId });
     if (eventIds.length !== 1) {
-      debugger;
+      console.log('no event');
+      return null;
     }
 
     const event : DmEvent = dmGetEventById(bsdm, { id : eventIds[0] });
     if (!event) {
-      debugger;
+      console.log('no event');
     }
 
     return event;
@@ -185,6 +201,9 @@ export default class MediaZone extends React.Component<MediaZoneStateProps & Med
       }
       case 'MrssFeed': {
         return this.renderMrssItem(contentItem as DmDataFeedContentItem);
+      }
+      case 'DataFeed': {  // Slick
+        return this.renderSlickItem(contentItem as DmDataFeedContentItem);
       }
       default: {
         break;
