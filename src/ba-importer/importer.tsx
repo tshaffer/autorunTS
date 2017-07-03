@@ -82,6 +82,7 @@ import {
   dmUpdateZoneProperties,
   ZonePropertyUpdateParams,
   VideoOrImagesZonePropertyParams,
+  dmCreateAssetItemFromLocalFile,
 } from '@brightsign/bsdatamodel';
 
 import * as Converters from './converters';
@@ -93,25 +94,6 @@ import {
 
 import ScheduledPresentation from './scheduledPresentation';
 import PresentationToSchedule from "./presentationToSchedule";
-
-export function dmCreateAssetItemFromLocalFile(
-  fullPath: string,
-  id: BsAssetId = '',
-  mediaType: MediaType = null,
-): BsAssetItem {
-  const name = fullPath.replace(/^.*[\\\/]/, '');
-  const path = fullPath.substr(0, fullPath.length - name.length);
-  return {
-    id,
-    name,
-    path,
-    networkId: 0,
-    location: AssetLocation.Local,
-    locator: bscGetLocalAssetLocator(fullPath),
-    assetType: AssetType.Content,
-    mediaType: mediaType ? mediaType : bscGetFileMediaType(name),
-  };
-}
 
 type ArFileLUT = { [fileName:string]: string };
 
