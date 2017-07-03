@@ -1,7 +1,5 @@
 import * as React from 'react';
 import Slider from 'react-slick';//TODO remove
-import "slick-carousel/slick/slick.scss";
-import "slick-carousel/slick/slick-theme.scss";
 
 import path = require('path');
 
