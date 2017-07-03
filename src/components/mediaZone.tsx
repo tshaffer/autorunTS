@@ -9,6 +9,7 @@ import {
 // import DesktopPlatformService from '../platform/desktop/DesktopPlatformService';
 
 import ImageContainer from '../containers/imageContainer';
+import SlickContainer from '../containers/slickContainer';
 import VideoContainer from '../containers/videoContainer';
 import MrssDisplayItemContainer from '../containers/mrssDisplayItemContainer';
 
@@ -110,6 +111,15 @@ export default class MediaZone extends React.Component<MediaZoneStateProps & Med
             onVideoEnd={self.postMediaEndEvent.bind(this)}
             src={src}
           />
+        );
+      }
+      case 'Slick': {
+        return (
+          <SlickContainer
+            width={this.props.width}
+            height={this.props.height}
+            src={src}
+            />
         );
       }
       default: {

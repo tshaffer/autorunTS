@@ -5,6 +5,7 @@ const StringDecoder = require('string_decoder').StringDecoder;
 const decoder = new StringDecoder('utf8');
 
 import {
+  DataFeedUsageType,
   AssetLocation,
   bscGetLocalAssetLocator,
   bscGetFileMediaType,
@@ -32,10 +33,20 @@ import {
 } from '@brightsign/bscore';
 
 import {
-  dmAddZone, dmUpdateMediaState
+  dmAddZone, DmDerivedNonMediaContentItem, dmUpdateMediaState
 } from '@brightsign/bsdatamodel';
 
 import {
+  DmDataFeedContentItem,
+  DataFeedParams,
+  dmGetParameterizedStringFromString,
+  DmDataFeed,
+  DmParameterizedString,
+  dmCreateDataFeedContentItem,
+  dmGetSimpleStringFromParameterizedString,
+  DataFeedAction,
+  dmAddDataFeed,
+  dmCreateHtmlContentItem,
   DmcMediaState,
   dmGetMediaStateByName,
   TransitionAction,
@@ -649,13 +660,19 @@ function addMediaStates(zoneId : BsDmId, bacZone : any, dispatch : Function) : a
 
   const bacStates = bacZone.playlist.states.state;
 
+  let iterableStates : any = bacStates;
+  if (!(bacStates instanceof Array)) {
+    iterableStates = [bacStates];
+  }
+
   let addMediaStatePromises : Array<any> = [];
   // let addMediaStatePromises : Array<Promise<BsDmAction<MediaStateParams>>> = [];
-  bacStates.forEach( (bacMediaState : any) => {
+  iterableStates.forEach( (bacMediaState : any) => {
 
     let fileName;
     let filePath;
     let bsAssetItem : BsAssetItem;
+    let contentItem : BsAssetItem | DmDerivedNonMediaContentItem;
     if (bacMediaState.imageItem) {
 
       const bacImageItem : any = bacMediaState.imageItem;
@@ -676,17 +693,54 @@ function addMediaStates(zoneId : BsDmId, bacZone : any, dispatch : Function) : a
         transitionDuration,
         videoPlayerRequired
       }
+
+      contentItem = bsAssetItem;
+    }
+    else if (bacMediaState.slickItem) {
+      const bacSlickItem : any = bacMediaState.slickItem;
+
+      // try to fool bsdm
+      const url : DmParameterizedString = dmGetParameterizedStringFromString(JSON.stringify(bacSlickItem));
+      const dataFeedAction : BsDmAction<DataFeedParams> = dmAddDataFeed(bacSlickItem.name, url, DataFeedUsageType.Text);
+      const dataFeedParamAction : BsDmAction<DataFeedParams> = dispatch(dataFeedAction);
+      const dataFeedParams : DataFeedParams = dataFeedParamAction.payload;
+      const dataFeedId : BsDmId = dataFeedParams.id;
+      const dataFeedContentItem : DmDataFeedContentItem = dmCreateDataFeedContentItem(bacSlickItem.name, dataFeedId);
+      console.log(dataFeedContentItem);
+
+      contentItem = dataFeedContentItem;
     }
     else if (bacMediaState.videoItem) {
       debugger;
     }
 
-    const addMediaStatePromise : Promise<BsDmAction<MediaStateParams>> = dispatch(dmAddMediaState(bacMediaState.name, dmGetZoneMediaStateContainer(zoneId), bsAssetItem));
+    const addMediaStatePromise : Promise<BsDmAction<MediaStateParams>> = dispatch(dmAddMediaState(bacMediaState.name, dmGetZoneMediaStateContainer(zoneId), contentItem));
     addMediaStatePromises.push(addMediaStatePromise);
   });
 
   return addMediaStatePromises;
 }
+
+// export function dmCreateDataFeedContentItem(name: string, dataFeedId: BsDmId): DmDataFeedContentItem;
+
+const createHtmlContentItem = (asset : any = {}) => {
+  //const currentHtmlSites = dmGetHtmlSiteIdsForSign(getBsdmStore(state));
+  //if(currentHtmlSites.length > 0)
+  //  return dmGetMediaStateById(state.bsdm, {id: currentHtmlSites[0]});
+  //else
+  //  return null;
+  return dmCreateHtmlContentItem(
+    asset.name,
+    asset.siteId,
+    asset.enableExternalData,
+    asset.enableMouseEvents,
+    asset.displayCursor,
+    asset.hwzOn,
+    asset.useUserStylesheet,
+    asset.userStylesheetAssetId,
+    asset.customFonts
+  );
+};
 
 function addTransitions(bacZone : any, dispatch : Function, getState : Function) {
 
@@ -694,41 +748,43 @@ function addTransitions(bacZone : any, dispatch : Function, getState : Function)
 
   const transitions = bacZone.playlist.states.transition;
 
-  transitions.forEach( (bacTransition : any) => {
-    console.log(bacTransition);
+  if (transitions) {
+    transitions.forEach( (bacTransition : any) => {
+      console.log(bacTransition);
 
-    // TODO I don't see the following 3 variables used in bsdm - ??
-    const assignInputToUserVariable : boolean = Converters.stringToBool(bacTransition.assignInputToUserVariable);
-    const assignWildcardToUserVariable : boolean = Converters.stringToBool(bacTransition.assignWildcardToUserVariable);
-    const remainOnCurrentStateActions : string = bacTransition.remainOnCurrentStateActions;
-    const sourceMediaStateName : string = bacTransition.sourceMediaState;
-    const targetMediaStateName : string = bacTransition.targetMediaState;
-    const userEvent : any = bacTransition.userEvent;
-    const userEventName : string = userEvent.name;
-    const parameters : any = userEvent.parameters;
-    const parameter : string = parameters.parameter;
-    // TODO - need code to properly convert parameters
-    const duration : number = Number(parameter);
+      // TODO I don't see the following 3 variables used in bsdm - ??
+      const assignInputToUserVariable : boolean = Converters.stringToBool(bacTransition.assignInputToUserVariable);
+      const assignWildcardToUserVariable : boolean = Converters.stringToBool(bacTransition.assignWildcardToUserVariable);
+      const remainOnCurrentStateActions : string = bacTransition.remainOnCurrentStateActions;
+      const sourceMediaStateName : string = bacTransition.sourceMediaState;
+      const targetMediaStateName : string = bacTransition.targetMediaState;
+      const userEvent : any = bacTransition.userEvent;
+      const userEventName : string = userEvent.name;
+      const parameters : any = userEvent.parameters;
+      const parameter : string = parameters.parameter;
+      // TODO - need code to properly convert parameters
+      const duration : number = Number(parameter);
 
-    // TODO - what is duration vs. mediaStateDuration? answer - they are set to the same value.
+      // TODO - what is duration vs. mediaStateDuration? answer - they are set to the same value.
 
-    const sourceMediaState : DmcMediaState = dmGetMediaStateByName(state, { name : sourceMediaStateName});
+      const sourceMediaState : DmcMediaState = dmGetMediaStateByName(state, { name : sourceMediaStateName});
 
-    const targetMediaState : DmcMediaState = dmGetMediaStateByName(state, { name : targetMediaStateName});
+      const targetMediaState : DmcMediaState = dmGetMediaStateByName(state, { name : targetMediaStateName});
 
-    const mediaStateProps : MediaStateProperties = mapBacMediaStateNameToMediaStateProps[sourceMediaState.name];
-    const { name, mediaStateDuration, transitionType, transitionDuration, videoPlayerRequired } = mediaStateProps;
-    mediaStateNamesToUpdateByMediaStateId[sourceMediaState.id] = name;
+      const mediaStateProps : MediaStateProperties = mapBacMediaStateNameToMediaStateProps[sourceMediaState.name];
+      const { name, mediaStateDuration, transitionType, transitionDuration, videoPlayerRequired } = mediaStateProps;
+      mediaStateNamesToUpdateByMediaStateId[sourceMediaState.id] = name;
 
-    // TODO - what is the proper js method to convert from string to enum value, in this case EventType.Timer?
-    const eventAction : EventAction = dispatch(dmAddEvent(userEventName, EventType.Timer, sourceMediaState.id,
-      { interval : duration} ));
-    console.log(eventAction);
+      // TODO - what is the proper js method to convert from string to enum value, in this case EventType.Timer?
+      const eventAction : EventAction = dispatch(dmAddEvent(userEventName, EventType.Timer, sourceMediaState.id,
+        { interval : duration} ));
+      console.log(eventAction);
 
-    const transitionAction : TransitionAction = dispatch(dmAddTransition('myTransition', eventAction.payload.id,
-      targetMediaState.id, transitionType, transitionDuration));
-    console.log(transitionAction);
-  });
+      const transitionAction : TransitionAction = dispatch(dmAddTransition('myTransition', eventAction.payload.id,
+        targetMediaState.id, transitionType, transitionDuration));
+      console.log(transitionAction);
+    });
+  }
 }
 
 

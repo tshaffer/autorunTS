@@ -1,5 +1,4 @@
 import * as React from 'react';
-import Slider from 'react-slick';//TODO remove
 
 import path = require('path');
 
@@ -29,46 +28,26 @@ export default class Image extends React.Component<ImageProps, object> {
     return true;
   }
 
-  // render() {
-  //
-  //   const self: Image = this;
-  //
-  //   if (this.timeout) {
-  //     debugger;
-  //   }
-  //
-  //   this.timeout = setTimeout( () => {
-  //       this.timeout = null;
-  //       self.props.onTimeout();
-  //     }
-  //     , this.props.duration);
-  //
-  //   return (
-  //     <img
-  //       src={this.props.src}
-  //       width={this.props.width.toString()}
-  //       height={this.props.height.toString()}
-  //     />
-  //   );
-  // }
-
   render() {
-    var settings = {
-      dots: true,
-      // infinite: true,
-      // speed: 500,
-      slidesToShow: 2,
-      // slidesToScroll: 1
-    };
+
+    const self: Image = this;
+
+    if (this.timeout) {
+      debugger;
+    }
+
+    this.timeout = setTimeout( () => {
+        this.timeout = null;
+        self.props.onTimeout();
+      }
+      , this.props.duration);
+
     return (
-      <div className='slickContainer'>
-        <Slider {...settings}>
-          <div><img src='http://placekitten.com/g/400/200' /></div>
-          <div><img src='http://placekitten.com/g/400/200' /></div>
-          <div><img src='http://placekitten.com/g/400/200' /></div>
-          <div><img src='http://placekitten.com/g/400/200' /></div>
-        </Slider>
-      </div>
+      <img
+        src={this.props.src}
+        width={this.props.width.toString()}
+        height={this.props.height.toString()}
+      />
     );
   }
 }
