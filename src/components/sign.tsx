@@ -26,8 +26,8 @@ export default class Sign extends React.Component<SignProps, object> {
                   position: 'absolute',
                   left: zone.absolutePosition.x,
                   top: zone.absolutePosition.y,
-                  width: zone.absolutePosition.width,
-                  height: zone.absolutePosition.height,
+                  width: zone.absolutePosition.width*0.75,
+                  height: zone.absolutePosition.height*0.75,
                 }}
             >
                 <MediaZoneContainer
@@ -35,8 +35,8 @@ export default class Sign extends React.Component<SignProps, object> {
                     playbackState={this.props.playbackState}
                     bsdm={this.props.bsdm}
                     zone={zone}
-                    width={Number(zone.absolutePosition.width)}
-                    height={Number(zone.absolutePosition.height)}
+                    width={Number(zone.absolutePosition.width)*0.75}
+                    height={Number(zone.absolutePosition.height)*0.75}
                     activeMediaStateId={''}
                 />
             </div>

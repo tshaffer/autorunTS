@@ -24,7 +24,13 @@ export default class Slick extends React.Component<SlickProps, object> {
   getSources() {
     return this.props.filePaths.map( (filePath : string, index : number) => {
       return (
-        <div key={index}><img src={filePath} key={index}/></div>
+        <div key={index} className='slickItem'>
+          <img
+            src={filePath}
+            width={this.props.width * 0.75}
+            height={this.props.height * 0.75}
+          />
+        </div>
         );
     });
   }
@@ -34,9 +40,9 @@ export default class Slick extends React.Component<SlickProps, object> {
       dots: true,
       infinite: true,
       // speed: 500,
-      // slidesToShow: 2,
+      slidesToShow: 2,
       // slidesToScroll: 1,
-      autoplay : true,
+      autoplay : false,
       autoplaySpeed : 2000,
       fade : true,
     };
