@@ -17,6 +17,17 @@ export interface SignProps {
 
 export default class Sign extends React.Component<SignProps, object> {
 
+  plugin : any;
+  mainDiv : any;
+
+  constructor (props : any) {
+    super(props);
+
+    const pluginSource = '/Users/tedshaffer/Documents/Projects/autorunTs/plugins/plugin-0';
+    this.plugin = eval('require')(pluginSource);
+    console.log(this.plugin.foo, this.plugin.bar);
+  }
+
     getMediaZoneJSX(zone : DmcZone) : object {
 
         return (
@@ -25,7 +36,7 @@ export default class Sign extends React.Component<SignProps, object> {
                 style={{
                   position: 'absolute',
                   left: zone.absolutePosition.x,
-                  top: zone.absolutePosition.y,
+                  top: zone.absolutePosition.y + 50,
                   width: zone.absolutePosition.width,
                   height: zone.absolutePosition.height,
                 }}
@@ -87,12 +98,26 @@ export default class Sign extends React.Component<SignProps, object> {
         }
     }
 
+    renderPluginContents(mainDiv : any) {
+      const pluginHtml = this.plugin.text;
+      mainDiv.appendChild(pluginHtml);
+    }
+
     render() {
+
+      const self = this;
 
         const zoneIds : string[] = dmGetZonesForSign(this.props.bsdm);
 
         return (
-            <div>
+            <div
+              ref={(c) => {
+                if (c) {
+                  self.mainDiv = c;
+                  self.renderPluginContents(self.mainDiv);
+                }
+              }}
+              >
                 {
                     zoneIds.map( (zoneId) =>
                         this.getZoneJSX(zoneId),

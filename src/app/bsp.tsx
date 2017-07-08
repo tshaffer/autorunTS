@@ -130,6 +130,8 @@ export class BSP {
 
     console.log('bsp initialization');
 
+    console.log(__dirname);
+
     this.store = reduxStore;
     this.dispatch = this.store.dispatch;
     this.getState = this.store.getState;
@@ -139,7 +141,7 @@ export class BSP {
     const rootPath = PlatformService.default.getRootDirectory();
     const pathToPool = PlatformService.default.getPathToPool();
 
-    this.importPublishedFiles = true;
+    this.importPublishedFiles = false;
 
     if (this.importPublishedFiles) {
       this.parseImportedPublishedFiles(rootPath, pathToPool).then( () => {
