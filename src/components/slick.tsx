@@ -36,7 +36,7 @@ export default class Slick extends React.Component<SlickProps, object> {
       // speed: 500,
       // slidesToShow: 2,
       // slidesToScroll: 1,
-      autoplay : true,
+      autoplay : false,
       autoplaySpeed : 2000,
       fade : true,
     };

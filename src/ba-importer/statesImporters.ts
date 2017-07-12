@@ -153,7 +153,6 @@ export function addMediaStates(zoneId : BsDmId, bacZone : any, dispatch : Functi
       const dataFeedParamAction : BsDmAction<DataFeedParams> = dispatch(dataFeedAction);
       const dataFeedParams : DataFeedParams = dataFeedParamAction.payload;
       const dataFeedId : BsDmId = dataFeedParams.id;
-      // const dataFeedContentItem : DmDataFeedContentItem = dmCreateDataFeedContentItem(bacSlickItem.name, dataFeedId);
       const dataFeedContentItem : DmMrssDataFeedContentItem = dmCreateMrssDataFeedContentItem(bacSlickItem.name, dataFeedId);
       console.log(dataFeedContentItem);
 
@@ -170,8 +169,6 @@ export function addMediaStates(zoneId : BsDmId, bacZone : any, dispatch : Functi
 
   return addMediaStatePromises;
 }
-
-// export function dmCreateDataFeedContentItem(name: string, dataFeedId: BsDmId): DmDataFeedContentItem;
 
 const createHtmlContentItem = (asset : any = {}) => {
   //const currentHtmlSites = dmGetHtmlSiteIdsForSign(getBsdmStore(state));
@@ -191,51 +188,3 @@ const createHtmlContentItem = (asset : any = {}) => {
     asset.customFonts
   );
 };
-
-/*
- <<<<<<< 7e6ea66ff4557fee6cfe3d6206282b22ad2d6377
- function addMediaStates(zoneId : BsDmId, bacZone : any, dispatch : Function) {
-
- const bacStates = bacZone.playlist.states.state;
-
- bacStates.forEach( (bacMediaState : any) => {
-
- let fileName;
- let filePath;
- let bsAssetItem : BsAssetItem;
- if (bacMediaState.imageItem) {
-
- const bacImageItem : any = bacMediaState.imageItem;
-
- fileName = bacImageItem.file['@name'];
- filePath = Utilities.getPoolFilePath(fileName);
- bsAssetItem = dmCreateAssetItemFromLocalFile(filePath, '', MediaType.Image);
-
- const mediaStateDuration : number = Converters.stringToNumber(bacImageItem.slideDelayInterval);
- const transitionType : TransitionType = Converters.getTransitionType(bacImageItem.slideTransition);
- const transitionDuration : number = Converters.stringToNumber(bacImageItem.transitionDuration);
- const videoPlayerRequired : boolean = Converters.stringToBool(bacImageItem.videoPlayerRequired);
-
- mapBacMediaStateNameToMediaStateProps[bacMediaState.name] = {
- name : fileName,
- mediaStateDuration,
- transitionType,
- transitionDuration,
- videoPlayerRequired
- }
- }
- else if (bacMediaState.videoItem) {
- debugger;
- }
-
- const addMediaStateThunk : BsDmThunkAction<MediaStateParams> = (dmAddMediaState(bacMediaState.name, dmGetZoneMediaStateContainer(zoneId), bsAssetItem));
- const bsDmAction : BsDmAction<MediaStateParams> = dispatch(addMediaStateThunk);
- const mediaStateParams : MediaStateParams = bsDmAction.payload;
- });
- }
-
- =======
- >>>>>>> initial work on slick. failing to load css files.
-
- */
-

@@ -5,12 +5,6 @@ const StringDecoder = require('string_decoder').StringDecoder;
 const decoder = new StringDecoder('utf8');
 
 import {
-  DataFeedUsageType,
-  AssetLocation,
-  bscGetLocalAssetLocator,
-  bscGetFileMediaType,
-  AssetType,
-  BsAssetItem,
   GraphicsZOrderType,
   DeviceWebPageDisplay,
   LanguageKeyType,
@@ -27,9 +21,7 @@ import {
   MosaicMaxContentResolutionType,
   ImageModeType,
   EventType,
-  MediaType,
   TransitionType,
-  BsAssetId,
 } from '@brightsign/bscore';
 
 import {
@@ -37,20 +29,6 @@ import {
 } from '@brightsign/bsdatamodel';
 
 import {
-  BsDmThunkAction,
-  DmImageContentItemData,
-  DmMrssDataFeedContentItem,
-  dmCreateMrssDataFeedContentItem,
-  DmDataFeedContentItem,
-  DataFeedParams,
-  dmGetParameterizedStringFromString,
-  DmDataFeed,
-  DmParameterizedString,
-  dmCreateDataFeedContentItem,
-  dmGetSimpleStringFromParameterizedString,
-  DataFeedAction,
-  dmAddDataFeed,
-  dmCreateHtmlContentItem,
   DmcMediaState,
   dmGetMediaStateByName,
   TransitionAction,
@@ -58,11 +36,8 @@ import {
   dmAddEvent,
   BsDmId,
   EventAction,
-  MediaStateParams,
-  dmGetZoneMediaStateContainer,
   BsDmAction,
   ZoneParams,
-  dmAddMediaState,
   DmSignState,
   dmGetSignState,
   dmNewSign, DmSignMetadata, DmSignProperties,
@@ -86,11 +61,9 @@ import {
   dmUpdateZoneProperties,
   ZonePropertyUpdateParams,
   VideoOrImagesZonePropertyParams,
-  dmCreateAssetItemFromLocalFile,
 } from '@brightsign/bsdatamodel';
 
 import * as Converters from './converters';
-import * as Utilities from '../utilities/utilities';
 
 import { addMediaStates } from './statesImporters';
 import { mapBacMediaStateNameToMediaStateProps } from './statesImporters';
@@ -140,7 +113,6 @@ interface MediaStateProperties {
 
 type MediaStateNameToMediaStateProperties = { [mediaStateName : string]: MediaStateProperties };
 
-// let mapBacMediaStateNameToMediaStateProps : MediaStateNameToMediaStateProperties = {};
 let mediaStateNamesToUpdateByMediaStateId : MediaStateIdToMediaStateName = {};
 
 // type MyProp1 = string;
@@ -700,16 +672,6 @@ function updateAutoplayZone(bacZone : any, dispatch : Function, getState : Funct
   addMediaStates(zoneId, bacZone, dispatch);
   addTransitions(bacZone, dispatch, getState);
   updateNames(mediaStateNamesToUpdateByMediaStateId, dispatch);
-/*
-  updateNames(mediaStateNamesToUpdateByMediaStateId, dispatch);
-    const addMediaStatePromises : Array<BsDmAction<MediaStateParams>> = addMediaStates(zoneId, bacZone, dispatch);
-    Promise.all(addMediaStatePromises).then((mediaStateParamActions : Array<BsDmAction<MediaStateParams>>) => {
-      addTransitions(bacZone, dispatch, getState);
-      updateNames(mediaStateNamesToUpdateByMediaStateId, dispatch);
-      resolve();
-    });
-  });
-*/
 }
 
 function updateNames(namesToUpdateById : MediaStateIdToMediaStateName, dispatch : Function){
