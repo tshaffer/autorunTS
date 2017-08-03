@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 // import ImportableComponent from '../../../importableComponent/dist/importableComponent.js';
-import ImportableComponent = require('../../../importableComponent/dist/importableComponent');
+// import ImportableComponent = require('../../../importableComponent/dist/importableComponent');
 
 import {
     DmState,
@@ -18,6 +18,8 @@ export interface SignProps {
     playbackState : string;
 }
 
+let ImportableComponent : any = null;
+
 export default class Sign extends React.Component<SignProps, object> {
 
   plugin : any;
@@ -28,7 +30,7 @@ export default class Sign extends React.Component<SignProps, object> {
 
     // const pluginSource = '/Users/tedshaffer/Documents/Projects/autorunTs/plugins/plugin-0';
     const pluginSource = '/Users/tedshaffer/Documents/Projects/importableComponent/dist/importablecomponent.js';
-    this.plugin = eval('require')(pluginSource);
+    ImportableComponent = eval('require')(pluginSource);
     // console.log(this.plugin.foo, this.plugin.bar);
   }
 
