@@ -34,19 +34,6 @@ export default class Sign extends React.Component<SignProps, object> {
 
     getMediaZoneJSX(zone : DmcZone) : object {
 
-      // const components : any = {
-      //   example: React.createFactory( require('../../../importableComponent/dist/importableComponent') )
-      // };
-      // console.log(components);
-      // var type = "example";
-      // const newComponent = components[type]({ attribute: "value" });
-
-      // const poo : any = React.createElement(ImportableComponent, {});
-
-      // const Poo : any = ImportableComponent;
-
-      // {/*<ImportableComponent/>*/}
-
       return (
             <div
                 key={zone.id}
@@ -122,28 +109,18 @@ export default class Sign extends React.Component<SignProps, object> {
 
     render() {
 
-      const Poo : any = ImportableComponent;
-
       const self = this;
 
-        const zoneIds : string[] = dmGetZonesForSign(this.props.bsdm);
-
-      // ref={(c) => {
-      //   if (c) {
-      //     self.mainDiv = c;
-      //     self.renderPluginContents(self.mainDiv);
-      //   }
-      // }}
+      const zoneIds : string[] = dmGetZonesForSign(this.props.bsdm);
 
       return (
             <div>
-              <Poo/>
-
+              <ImportableComponent/>
               {
                     zoneIds.map( (zoneId) =>
                         this.getZoneJSX(zoneId),
                     )
-                }
+              }
             </div>
         );
     }
