@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "allowJs": true,
     "outDir": "./temp",
     "sourceMap": true,
     "noImplicitAny": true,

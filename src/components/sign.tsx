@@ -1,5 +1,8 @@
 import * as React from 'react';
 
+// import ImportableComponent from '../../../importableComponent/dist/importableComponent.js';
+import ImportableComponent = require('../../../importableComponent/dist/importableComponent');
+
 import {
     DmState,
   DmcZone,
@@ -23,14 +26,28 @@ export default class Sign extends React.Component<SignProps, object> {
   constructor (props : any) {
     super(props);
 
-    const pluginSource = '/Users/tedshaffer/Documents/Projects/autorunTs/plugins/plugin-0';
+    // const pluginSource = '/Users/tedshaffer/Documents/Projects/autorunTs/plugins/plugin-0';
+    const pluginSource = '/Users/tedshaffer/Documents/Projects/importableComponent/dist/importablecomponent.js';
     this.plugin = eval('require')(pluginSource);
-    console.log(this.plugin.foo, this.plugin.bar);
+    // console.log(this.plugin.foo, this.plugin.bar);
   }
 
     getMediaZoneJSX(zone : DmcZone) : object {
 
-        return (
+      // const components : any = {
+      //   example: React.createFactory( require('../../../importableComponent/dist/importableComponent') )
+      // };
+      // console.log(components);
+      // var type = "example";
+      // const newComponent = components[type]({ attribute: "value" });
+
+      // const poo : any = React.createElement(ImportableComponent, {});
+
+      // const Poo : any = ImportableComponent;
+
+      // {/*<ImportableComponent/>*/}
+
+      return (
             <div
                 key={zone.id}
                 style={{
@@ -105,20 +122,24 @@ export default class Sign extends React.Component<SignProps, object> {
 
     render() {
 
+      const Poo : any = ImportableComponent;
+
       const self = this;
 
         const zoneIds : string[] = dmGetZonesForSign(this.props.bsdm);
 
-        return (
-            <div
-              ref={(c) => {
-                if (c) {
-                  self.mainDiv = c;
-                  self.renderPluginContents(self.mainDiv);
-                }
-              }}
-              >
-                {
+      // ref={(c) => {
+      //   if (c) {
+      //     self.mainDiv = c;
+      //     self.renderPluginContents(self.mainDiv);
+      //   }
+      // }}
+
+      return (
+            <div>
+              <Poo/>
+
+              {
                     zoneIds.map( (zoneId) =>
                         this.getZoneJSX(zoneId),
                     )
