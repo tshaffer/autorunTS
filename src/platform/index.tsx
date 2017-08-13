@@ -1,4 +1,10 @@
+// I think this one worked
 declare function BSDeviceInfo() : void;
+
+// I haven't tried this one
+// declare class BSDeviceInfo {
+//   new(): BSDeviceInfo;
+// }
 
 let platform;
 
@@ -11,6 +17,9 @@ try {
   var VideoModeClass = require("@brightsign/videomodeconfiguration");
   var vm = new VideoModeClass();
   const deviceInfo = new BSDeviceInfo();
+
+  // var deviceInfo = new (<any>BSDeviceInfo)();
+
   console.log('deviceInfo creation succeeded, running on a brightSign');
   console.log(deviceInfo);
   platform = 'brightsign';
