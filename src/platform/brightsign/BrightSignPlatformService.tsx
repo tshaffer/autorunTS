@@ -1,3 +1,6 @@
+declare function BSControlPort(portName : string) : void;
+declare function BSDeviceInfo() : void;
+
 import APlatformService from '../APlatformService';
 
 import {
@@ -91,7 +94,7 @@ class BrightSignPlatformService extends APlatformService {
 
   static getControlPort(portName : string) : any {
     return new Promise( (resolve : any) => {
-      let controlPort = null;
+      let controlPort : any = null;
       try {
         controlPort = new BSControlPort(portName);
       }

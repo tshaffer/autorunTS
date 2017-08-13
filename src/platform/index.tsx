@@ -1,3 +1,4 @@
+declare function BSDeviceInfo() : void;
 
 let platform;
 
@@ -17,31 +18,6 @@ try {
   vm.getBestMode("hdmi").then((bestMode : any) => {
     console.log(bestMode);
   });
-
-  // test bs object requires
-
-  // const VideoOutputConfiguration = require('@brightsign/videooutput');
-  // const voc = new VideoOutputConfiguration('hdmi');
-  // voc.getEdid().then((monitorEdid: any) => {
-  //   console.log('received edid');
-  //   console.log(monitorEdid);
-  // });
-
-  // const VideoOutputConfiguration = require('@brightsign/videooutputconfiguration');
-  // const voc = new VideoOutputConfiguration('hdmi');
-  // voc.getEdid().then((monitorEdid: any) => {
-  //   console.log('received edid');
-  //   console.log(monitorEdid);
-  // });
-
-  // const bsClass0 = require("@brightsign/networkhost");
-  // const bsClass1= require("@brightsign/utils");
-  // const bsClass2 = require("@brightsign/dws");
-  // const bsClass3 = require("@brightsign/networkdiagnostics");
-  // const bsClass4 = require("@brightsign/touchscreen");
-  // const bsClass5 = require("@brightsign/videoinputconfiguration");
-  // const bsClass6 = require("@brightsign/systemtime");
-  // const bsClass7 = require("@brightsign/registry");
 }
 catch (e) {
   console.log('deviceInfo creation failed, not a brightSign');

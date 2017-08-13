@@ -3,7 +3,6 @@
     "allowJs": true,
     "outDir": "./temp",
     "sourceMap": true,
-    "noImplicitAny": true,
     "module": "commonjs",
     "target": "es5",
     "jsx": "react",
@@ -19,3 +18,7 @@
     "temp"
   ]
 }
+
+//"noImplicitAny": true,
+
+
