@@ -1,5 +1,6 @@
 import fs = require('fs');
 import path = require('path');
+const xml2js = require('xml2js');
 
 const StringDecoder = require('string_decoder').StringDecoder;
 const decoder = new StringDecoder('utf8');
@@ -141,6 +142,7 @@ export class BSP {
   videoOutput : any;
   graphicsResolution : BsSize;
 
+  lwsConfig : string;
 
   constructor() {
     if (!_singleton) {
@@ -252,19 +254,63 @@ export class BSP {
     // determine whether or not storage is writable
   }
 
-  processGetID() {
-    console.log('processGetID');
-    console.log(this);
+  processGetID(response : any) {
+
+    const obj = {name: "Super", Surname: "Man", age: 23};
+// /*
+//  <BrightSignID>
+//   <name>Super</name>
+//   <Surname>Man</Surname>
+//   <age>23</age>
+//  </BrightSignID>
+// */
+//     const builder = new xml2js.Builder({
+//       rootName : 'BrightSignID'
+//     });
+//     const xml = builder.buildObject(obj);
+
+    const xml : any = this.populateIdData();
+    response.set('Content-Type', 'text/xml');
+    response.send(xml);
+    /*
+     root = CreateObject("roXMLElement")
+     root.SetName("BrightSignID")
+     PopulateIDData(mVar, root)
+     */
+  }
+
+  getRegistryValue(key : string) : string {
+    return PlatformService.default.getRegistryValue(this.networkingRegistrySettings, key);
+  }
+
+  populateIdData() : any {
+
+    const response : any = {};
+
+    response.unitName = this.getRegistryValue('un');
+    response.unitNamingMethod = this.getRegistryValue('unm');
+    response.unitDescription = this.getRegistryValue('ud');
+    response.serialNumber = this.sysInfo.deviceUniqueId;
+    response.functionality = this.lwsConfig;
+    response.autorunVersion = this.sysInfo.autorunVersion;
+    response.firmwareVersion = this.sysInfo.deviceFWVersion;
+    response.bsnActive = 'no'; // TODO
+    response.snapshotsAvailable = 'yes'; // TODO
+    const builder = new xml2js.Builder({
+      rootName : 'BrightSignID'
+    });
+
+    return builder.buildObject(response);
   }
 
   lwsInit() {
 
-    let lwsConfig = PlatformService.default.getRegistryValue(this.networkingRegistrySettings, 'nlws');
+    this.lwsConfig = PlatformService.default.getRegistryValue(this.networkingRegistrySettings, 'nlws');
 
     // if the device is configured for local file networking with content transfers, require that the storage is writable
     // if BSP.registrySettings.lwsConfig$ = "c" and BSP.sysInfo.storageIsWriteProtected then DisplayStorageDeviceLockedMessage()
 
-    const lwsEnabled = (lwsConfig === 'c' || lwsConfig === 's');
+    const lwsEnabled = (this.lwsConfig === 'c' || this.lwsConfig === 's');
 
     if (lwsEnabled) {
 
@@ -276,9 +322,7 @@ export class BSP {
       });
 
       app.get('/GetID', (req : any, res : any) => {
-        console.log(this);
-        this.processGetID();
-        res.send('GetID invoked!')
+        this.processGetID(res);
       })
 
       const lwsUserName = PlatformService.default.getRegistryValue(this.networkingRegistrySettings, 'nlwsu');
