@@ -209,7 +209,7 @@ export class BSP {
           this.setSystemInfo();
 
           this.initRemoteSnapshots().then(() => {
-            this.continueInit();
+            this.lwsInit();
             this.parseNativeFiles(rootPath, pathToPool).then(() => {
               this.launchHSM();
             });
@@ -252,38 +252,49 @@ export class BSP {
     // determine whether or not storage is writable
   }
 
-  continueInit() {
+  processGetID() {
+    console.log('processGetID');
+    console.log(this);
+  }
+
+  lwsInit() {
 
     let lwsConfig = PlatformService.default.getRegistryValue(this.networkingRegistrySettings, 'nlws');
 
     // if the device is configured for local file networking with content transfers, require that the storage is writable
     // if BSP.registrySettings.lwsConfig$ = "c" and BSP.sysInfo.storageIsWriteProtected then DisplayStorageDeviceLockedMessage()
 
-    let lwsEnabled = false
-    if (lwsConfig === 'c' || lwsConfig === 's') {
-      lwsEnabled = true;
+    const lwsEnabled = (lwsConfig === 'c' || lwsConfig === 's');
+
+    if (lwsEnabled) {
+
+      const express = require('express');
+      const app = express();
+
+      app.listen(8080, function () {
+        console.log('BrightSign LFN server started.')
+      });
+
+      app.get('/GetID', (req : any, res : any) => {
+        console.log(this);
+        this.processGetID();
+        res.send('GetID invoked!')
+      })
+
+      const lwsUserName = PlatformService.default.getRegistryValue(this.networkingRegistrySettings, 'nlwsu');
+      const lwsPassword = PlatformService.default.getRegistryValue(this.networkingRegistrySettings, 'nlwsp');
+
+      let lwsCredentials : any = {};
+      if (lwsUserName !== '' || lwsPassword !== '') {
+        lwsCredentials[lwsUserName] = lwsPassword;
+      }
+      else {
+        lwsCredentials = null;
+      }
+
+
     }
 
-
-
-  //   if lwsEnabled then
-  //
-  //   BSP.localServer = CreateObject("roHttpServer", { port: 8080 })
-  //   BSP.localServer.SetPort(msgPort)
-  //
-  //   if lwsEnabled then
-  //
-  //   lwsUserName$ = BSP.registrySettings.lwsUserName$
-  //   lwsPassword$ = BSP.registrySettings.lwsPassword$
-  //
-  //   if (len(lwsUserName$) + len(lwsPassword$)) > 0 then
-  //   lwsCredentials = CreateObject("roAssociativeArray")
-  //   lwsCredentials.AddReplace(lwsUserName$, lwsPassword$)
-  // else
-  //   lwsCredentials = invalid
-  //   end if
-  //
-  //     endif
 
   }
 
