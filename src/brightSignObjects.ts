@@ -52,23 +52,6 @@ export function getBrightSignObjects() : Promise<any> {
 
     // roDiskMonitor
 
-    // roHttpServer??
-    const requestHandler = (request : any, response : any) => {
-      console.log(request.url)
-      response.end('Hello Node.js Server!')
-    }
-
-    // https://blog.risingstack.com/your-first-node-js-http-server/
-    const server = http.createServer(requestHandler);
-    const port = 6969;
-    server.listen(port, (err : any) => {
-      if (err) {
-        return console.log('something bad happened', err)
-      }
-
-      console.log(`server is listening on ${port}`)
-    });
-
     // roNetworkAdvertisement
 
     // roAssetPool - maybe not here

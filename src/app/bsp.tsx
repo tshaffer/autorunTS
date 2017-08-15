@@ -5,6 +5,17 @@ const xml2js = require('xml2js');
 const StringDecoder = require('string_decoder').StringDecoder;
 const decoder = new StringDecoder('utf8');
 
+// modify my bacon to upload a file using fetch (see link below) rather than as multipart form data
+// https://stackoverflow.com/questions/36067767/how-do-i-upload-a-file-with-the-html5-js-fetch-api
+// or maybe
+// https://www.npmjs.com/package/express-fileupload
+// or less likely
+// https://howtonode.org/really-simple-file-uploads
+
+const express = require('express');
+const bodyParser = require('body-parser');
+const app = express();
+
 import {Store} from 'redux';
 
 import {
@@ -255,34 +266,44 @@ export class BSP {
   }
 
   processGetID(response : any) {
-
-    const obj = {name: "Super", Surname: "Man", age: 23};
-// /*
-//  <BrightSignID>
-//   <name>Super</name>
-//   <Surname>Man</Surname>
-//   <age>23</age>
-//  </BrightSignID>
-// */
-//     const builder = new xml2js.Builder({
-//       rootName : 'BrightSignID'
-//     });
-//     const xml = builder.buildObject(obj);
-
     const xml : any = this.populateIdData();
     response.set('Content-Type', 'text/xml');
     response.send(xml);
-    /*
-     root = CreateObject("roXMLElement")
-     root.SetName("BrightSignID")
-     PopulateIDData(mVar, root)
-     */
+  }
+
+  processSpecifyCardSizeLimits(response : any) {
+    response.send('ok');
+  }
+
+  processPrepareForTransfer(request : any, response : any) {
+    console.log(request);
+    console.log(response);
+  }
+
+  processUploadFile(response : any) {
+  }
+
+  processUploadSyncSpec(response : any) {
   }
 
   getRegistryValue(key : string) : string {
     return PlatformService.default.getRegistryValue(this.networkingRegistrySettings, key);
   }
 
+  /*
+  BA Classic
+   <BrightSignID>
+   <unitName>lwsFromBATest</unitName>
+   <unitNamingMethod>appendUnitIDToUnitName</unitNamingMethod>
+   <unitDescription/>
+   <serialNumber>L8D68K000035</serialNumber>
+   <functionality>content</functionality>
+   <autorunVersion>7.8.4</autorunVersion>
+   <firmwareVersion>7.0.11</firmwareVersion>
+   <bsnActive>no</bsnActive>
+   <snapshotsAvailable>yes</snapshotsAvailable>
+   </BrightSignID>
+   */
   populateIdData() : any {
 
     const response : any = {};
@@ -314,8 +335,8 @@ export class BSP {
 
     if (lwsEnabled) {
 
-      const express = require('express');
-      const app = express();
+      app.use(bodyParser.json()); // support json encoded bodies
+      app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
       app.listen(8080, function () {
         console.log('BrightSign LFN server started.')
@@ -324,6 +345,33 @@ export class BSP {
       app.get('/GetID', (req : any, res : any) => {
         this.processGetID(res);
       })
+
+      app.get('/SpecifyCardSizeLimits', (req : any, res : any) => {
+        this.processSpecifyCardSizeLimits(res);
+      });
+
+      app.post('/PrepareForTransfer',  (req : any, res : any) => {
+        this.processPrepareForTransfer(req, res);
+      });
+
+      app.post('/UploadFile',  (req : any, res : any) => {
+        this.processUploadFile(res);
+      });
+
+      app.post('/UploadSyncSpec',  (req : any, res : any) => {
+        this.processUploadSyncSpec(res);
+      });
+
+      // see LWSPublisher for possible assistance
+      // lws uploads
+      // SpecifyCardSizeLimits - get
+      // PrepareForTransfer - post
+      // UploadFile - post
+      // UploadSyncSpec - post
+
+      // lws - independent of uploads
+      // GetCurrentStatus
+
 
       const lwsUserName = PlatformService.default.getRegistryValue(this.networkingRegistrySettings, 'nlwsu');
       const lwsPassword = PlatformService.default.getRegistryValue(this.networkingRegistrySettings, 'nlwsp');
