@@ -1,5 +1,3 @@
-// declare function BSControlPort(portName : string) : void;
-// declare function BSDeviceInfo() : void;
 declare class BSControlPort {
   constructor(portName : string);
 }
@@ -93,18 +91,27 @@ class BrightSignPlatformService extends APlatformService {
 
   static getEdid(videoOutputObj : any) : any {
     return new Promise( (resolve, reject) => {
-      videoOutputObj.getEdidIdentity().then( (edidIdentity: any) => {
-        console.log(edidIdentity);
-        resolve(edidIdentity);
 
-      }).catch( (err : any) => {
-        reject(err);
-      });
+      // videoOutputObj.getEdidIdentity().then( (edidIdentity: any) => {
+      //   console.log(edidIdentity);
+      //   resolve(edidIdentity);
+      //
+      // }).catch( (err : any) => {
+      //   reject(err);
+      // });
+
+
       // voc.getEdid().then((monitorEdid: any) => {
       //   console.log('received edid');
       //   resolve(monitorEdid);
       // });
+
+
+      resolve('');
+
     });
+
+
   }
 
   static getControlPort(portName : string) : any {

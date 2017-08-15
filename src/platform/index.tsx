@@ -1,9 +1,13 @@
-// I think this one worked
-// declare function BSDeviceInfo() : void;
-
-// I haven't tried this one
 declare class BSDeviceInfo {
-  new(): BSDeviceInfo;
+  constructor();
+  model: string;
+  version : string;
+  deviceUptime : number;
+  deviceLifetime : number;
+  deviceBootCount : number;
+  bootVersion : string;
+  deviceUniqueId : string;
+  family : string;
 }
 
 let platform;
