@@ -7,6 +7,8 @@ const decoder = new StringDecoder('utf8');
 import {Store} from 'redux';
 
 import {
+  AssetFetcherFileEvent,
+  AssetFetcherProgressEvent,
   BsDeviceInfo,
   BSNetworkInterfaceConfig,
   BsRegistry,
@@ -202,19 +204,91 @@ export class BSP {
 
         Object.assign(this, bsObjects);
 
-        PlatformService.default.readRegistrySection(this.registry, 'networking').then((networkingRegistrySettings: any[]) => {
+        // asset pool, etc. test code
 
-          this.networkingRegistrySettings = networkingRegistrySettings;
 
-          this.setSystemInfo();
+        // create asset pool
+        const AssetPoolClass = require("@brightsign/assetpool");
+        const assetPool = new AssetPoolClass('sd:/pool/');
 
-          this.initRemoteSnapshots().then(() => {
-            this.continueInit();
-            this.parseNativeFiles(rootPath, pathToPool).then(() => {
-              this.launchHSM();
-            });
+        // create asset collection from sync spec
+        this.openSyncSpec(path.join(rootPath, 'current-sync.json')).then((testSyncSpec: ArSyncSpec) => {
+
+          let assetCollection : any[] = [];
+
+          testSyncSpec.files.download.forEach( (download : any) => {
+            let asset : any = {};
+            asset.name = download.name;
+            asset.link = download.link;
+            asset.size = download.size;
+
+            asset.hash = {};
+            asset.hash.method = download.hash.method;
+            asset.hash.hex = download.hash.hex;
+            asset.changeHint = download.changeHint;
+
+            // asset.auth_inherit
+            // asset.auth_user
+            // asset.auth_password
+            // asset.headers_inherit
+
+            assetCollection.push(asset);
           });
+
+          // assetCollection = testSyncSpec.files.download;
+
+          const AssetPoolFetcherClass = require("@brightsign/assetpoolfetcher");
+          const assetPoolFetcher = new AssetPoolFetcherClass(assetPool);
+
+          assetPoolFetcher.addEventListener("progressevent", function(data : any)
+          {
+            const progressEvent : AssetFetcherProgressEvent = data.detail;
+
+            const { fileName, index, total, currentFileTransferred, currentFileTotal } = progressEvent;
+
+            console.log('progressEvent');
+            console.log('fileName: ' + fileName);
+            console.log('index: ' + index);
+            console.log('total: ' + total);
+            console.log('currentFileTransferred: ' + currentFileTransferred);
+            console.log('currentFileTotal: ' + currentFileTotal);
+          });
+
+          assetPoolFetcher.addEventListener("fileevent", function(data : any)
+          {
+            const fileEvent : AssetFetcherFileEvent = data.detail;
+
+            const { fileName, index, responseCode, error } = fileEvent;
+
+            console.log('fileEvent');
+            console.log('fileName: ' + fileName);
+            console.log('index: ' + index);
+            console.log('responseCode: ' + responseCode);
+            console.log('error: ' + error);
+          });
+
+          assetPoolFetcher.start(assetCollection).then( () => {
+            console.log('assetFetch complete');
+            debugger;
+          }).catch( (err : any) => {
+            console.log('assetFetch err: ' + err);
+            debugger;
+          })
         });
+
+        // PlatformService.default.readRegistrySection(this.registry, 'networking').then((networkingRegistrySettings: any[]) => {
+        //
+        //   this.networkingRegistrySettings = networkingRegistrySettings;
+        //
+        //   this.setSystemInfo();
+        //
+        //   this.initRemoteSnapshots().then(() => {
+        //     this.continueInit();
+        //     this.parseNativeFiles(rootPath, pathToPool).then(() => {
+        //       this.launchHSM();
+        //     });
+        //   });
+        // });
       });
     });
   }

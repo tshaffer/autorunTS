@@ -18,6 +18,9 @@ module.exports = {
 
   externals: {
     BSDeviceInfo : 'BSDeviceInfo',
+    '@brightsign/assetpool': 'commonjs @brightsign/assetpool',
+    '@brightsign/assetpoolfetcher': 'commonjs @brightsign/assetpoolfetcher',
+    '@brightsign/assetrealizer': 'commonjs @brightsign/assetrealizer',
     '@brightsign/registry': 'commonjs @brightsign/registry',
     '@brightsign/systemtime': 'commonjs @brightsign/systemtime',
     '@brightsign/networkconfiguration': 'commonjs @brightsign/networkconfiguration',

@@ -58,3 +58,18 @@ export interface BsSize {
   width : number;
   height : number;
 };
+
+export interface AssetFetcherFileEvent {
+  fileName : string;
+  index : number;
+  responseCode : number;
+  error : string;
+}
+
+export interface AssetFetcherProgressEvent {
+  fileName : string;
+  index : number;
+  total : number;
+  currentFileTransferred : number;
+  currentFileTotal : number;
+}
