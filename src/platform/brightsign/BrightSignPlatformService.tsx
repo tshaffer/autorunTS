@@ -1,9 +1,15 @@
 // const os = require('os');
 import os = require('os');
 
+import {
+  EventType,
+  ButtonPanelName,
+} from '@brightsign/bscore';
+
 declare class BSControlPort {
   constructor(portName : string);
 }
+
 declare class BSDeviceInfo {
   // new(): BSDeviceInfo;
   constructor();
@@ -29,6 +35,11 @@ import {
   BsScreenshotParams,
   BsSize,
 } from '../../brightSignInterfaces';
+
+import {
+  ArEventType,
+} from '../../types/index';
+
 
 class BrightSignPlatformService extends APlatformService {
 
@@ -316,6 +327,26 @@ class BrightSignPlatformService extends APlatformService {
     return registrySection[key.toLowerCase()];
   }
 
+  static AddEventHandlers(bsp : any) {
+    if (bsp.bp900ControlPort0) {
+      bsp.bp900ControlPort0.oncontroldown = function(e : any){
+        console.log('### oncontroldown ' + e.code);
+        const newtext = " DOWN: " + e.code + "\n";
+        console.log(newtext);
+  
+        const event : ArEventType = {
+          EventType: EventType.Bp,
+          EventData: {
+            ButtonPanelName: ButtonPanelName.Bp900a,
+            ButtonIndex: e.code
+          }
+        };
+  
+        bsp.dispatchPostMessage(event);
+      };
+    }  
+      
+  }
 }
 
 export default BrightSignPlatformService;

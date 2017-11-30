@@ -31,7 +31,7 @@ class App extends React.Component<any, object> {
             Object.keys(this.props.activeMediaStates.activeMediaStateIdByZone).length === 0) {
             return (
                 <div>
-                    Waiting for the presentation to be loaded...
+                  Waiting for the presentation to be loaded...
                 </div>
             );
         }

@@ -24,7 +24,12 @@ bsp.initialize(store);
 
 ReactDOM.render(
     <Provider store={store}>
-        <App />
+        <App
+          onKeyPress = {() => {
+            console.log('**** - onKeyPress invoked');
+          }}
+        >
+        </App>
     </Provider>,
     document.getElementById('content') as HTMLElement,
 );

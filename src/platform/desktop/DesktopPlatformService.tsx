@@ -1,3 +1,5 @@
+import fs = require('fs');
+
 import {
   BsDeviceInfo,
   BSNetworkInterfaceConfig,
@@ -143,6 +145,22 @@ class DesktopPlatformService {
     return '';
   }
 
+  static readline = require('readline');
+
+  static AddEventHandlers(bsp : any) {
+    console.log('AddEventHandlers');
+    // debugger;
+
+    // const rs = fs.createReadStream('/Users/tedshaffer/Documents/Projects/autorunTs/input.txt');
+
+    // const rl = DesktopPlatformService.readline.createInterface({
+    //   input: rs,
+    //   output: process.stdout
+    // });
+    // rl.on('line', (input : any) => {
+    //   console.log(`Received: ${input}`);
+    // });    
+  }    
 }
 
 export default DesktopPlatformService;

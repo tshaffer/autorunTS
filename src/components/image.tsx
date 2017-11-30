@@ -14,6 +14,12 @@ export default class Image extends React.Component<ImageProps, object> {
         src={this.props.src}
         width={this.props.width.toString()}
         height={this.props.height.toString()}
+        onKeyPress = {() => {
+          console.log('**** - onKeyPress invoked');
+        }}
+        onMouseDown = {() => {
+          console.log('**** - onMouseDown invoked');
+        }}
       />
     );
   }
