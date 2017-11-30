@@ -39,6 +39,7 @@ export default class MediaHState extends HState {
   
   eventLUT : SubscribedEvents = {};
   timeoutInterval : number = null;
+  timeout : any = null;
 
   addEvents(zoneHSM : ZoneHSM, eventIds : BsDmId[]) {
     
@@ -92,6 +93,15 @@ export default class MediaHState extends HState {
 
     stateData.nextState = this.superState;
     return 'SUPER';
+  }
+
+
+  mediaHStateExitHandler() : void {
+    console.log(this.id + ': exit signal');
+    if (this.timeout) {
+      clearTimeout(this.timeout);
+      this.timeout = null;
+    }
   }
 
 
@@ -164,11 +174,12 @@ export default class MediaHState extends HState {
   
   launchTimer() : void {
     if (this.timeoutInterval && this.timeoutInterval > 0) {
-      setTimeout(this.timeoutHandler, this.timeoutInterval * 1000, this);
+      this.timeout = setTimeout(this.timeoutHandler, this.timeoutInterval * 1000, this);
     }
   }
 
   timeoutHandler(mediaHState : MediaHState) {
+    this.timeout = null;
     const eventKey : string = 'timer-' + mediaHState.id;
     if (mediaHState.eventLUT.hasOwnProperty(eventKey)) {
       const targetHState : HState = mediaHState.eventLUT[eventKey];

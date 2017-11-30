@@ -34,16 +34,18 @@ export default class ImageState extends MediaHState {
   }
 
   STDisplayingImageEventHandler(event : ArEventType, stateData : HSMStateData) : string {
+    
     if (event.EventType === 'ENTRY_SIGNAL') {
         console.log(this.id + ': entry signal');
         this.stateMachine.dispatch(setActiveMediaState(this.stateMachine.id, this.id));
         this.launchTimer();
         return 'HANDLED';
     } else if (event.EventType === 'EXIT_SIGNAL') {
-      console.log(this.id + ': exit signal');
+      this.mediaHStateExitHandler();
     } else {
       return this.mediaHStateEventHandler(event, stateData);
     }
+
     stateData.nextState = this.superState;
     return 'SUPER';
   }
