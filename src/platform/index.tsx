@@ -43,4 +43,6 @@ if(platform === 'brightsign'){
 }else{
   loadedModule = require('./desktop/index.tsx');
 }
+loadedModule.default.initialize();
+
 export default loadedModule;

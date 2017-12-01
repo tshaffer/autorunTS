@@ -7,7 +7,30 @@ import {
   BsSize,
 } from '../../brightSignInterfaces';
 
+const http = require('http');
+
 class DesktopPlatformService {
+
+  static initialize() : void {
+
+    console.log('DesktopPlatformService.initialize()');
+
+    const port = 3000;
+
+    const simulatedEventHandler = (request: any, response: any) => {
+      console.log(request.url);
+      response.end('launched event input server on port' + port);
+    }
+
+    // https://blog.risingstack.com/your-first-node-js-http-server/
+    const simulatedEventServer = http.createServer(simulatedEventHandler);
+    simulatedEventServer.listen(port, (err: any) => {
+      if (err) {
+        return console.log('Error launching simulatedEventServer', err);
+      }
+      console.log(`simulatedEventServer is listening on ${port}`);
+    });
+  }
 
   // static srcDirectory = '/Users/tedshaffer/Desktop/aaa_bac';            // bac classic files - for import
   // static srcDirectory = '/Users/tedshaffer/Desktop/baconTestCard';   // bacon files - for non import

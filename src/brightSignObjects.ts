@@ -56,7 +56,7 @@ export function getBrightSignObjects() : Promise<any> {
     // roHttpServer??
     const requestHandler = (request: any, response: any) => {
       console.log(request.url)
-      response.end('Hello Node.js Server!')
+      response.end('launched roHttpServer equivalent on port 6969!')
     }
 
     // https://blog.risingstack.com/your-first-node-js-http-server/
