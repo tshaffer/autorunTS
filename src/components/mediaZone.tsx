@@ -59,7 +59,7 @@ export default class MediaZone extends React.Component<MediaZoneStateProps & Med
 
   postMediaEndEvent()  {
     const event : ArEventType = {
-      EventType : 'mediaEndEvent',
+      EventType : EventType.MediaEnd,
     };
     this.props.postBSPMessage(event);
   }

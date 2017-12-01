@@ -33,6 +33,8 @@ import { HState } from './HSM';
 import { ZoneHSM } from './zoneHSM';
 import { MediaZoneHSM } from './mediaZoneHSM';
 
+import VideoState from './videoState';
+
 export default class MediaHState extends HState {
 
   mediaState: DmMediaState;
@@ -42,7 +44,7 @@ export default class MediaHState extends HState {
   timeout : any = null;
 
   addEvents(zoneHSM : ZoneHSM, eventIds : BsDmId[]) {
-    
+
     eventIds.forEach( (eventId : BsDmId) => {
       
       // generate eventKey
@@ -78,8 +80,9 @@ export default class MediaHState extends HState {
 
     // iterate through the events for which this state has transitions - if any match the supplied event,
     // execute the associated transition
+
     const eventList : DmcEvent[] = (this.mediaState as DmcMediaState).eventList;
-    
+
     for (let stateEvent of eventList) {
       const bsEventKey : string = this.getBsEventKey(event);
       // TODO - hack to workaround unfinished code
@@ -116,6 +119,10 @@ export default class MediaHState extends HState {
       }
       case EventType.Timer: {
         bsEventKey = 'timer-' + this.id;
+        break;
+      }
+      case EventType.MediaEnd: {
+        bsEventKey = 'mediaEnd-' + this.id;
         break;
       }
       default: {
@@ -166,6 +173,11 @@ export default class MediaHState extends HState {
       case EventType.Timer: {
         const eventData : DmTimer = event.data as DmTimer;
         eventKey = 'timer-' + this.id;
+        break;
+      }
+      case EventType.MediaEnd: {
+        eventKey = 'mediaEnd-' + this.id;
+        break;
       }
     }
 
