@@ -147,6 +147,24 @@ export class BSP {
     if (!_singleton) {
       console.log('bsp constructor invoked');
       _singleton = this;
+
+      const http = require('http')
+      const port = 3000
+
+      const requestHandler = (request : any, response : any) => {
+        console.log(request.url)
+        response.end('Hello Node.js Server!')
+      }
+
+      const server = http.createServer(requestHandler)
+
+      server.listen(port, (err : any) => {
+        if (err) {
+          return console.log('something bad happened', err)
+        }
+
+        console.log(`server is listening on ${port}`)
+      })
     }
   }
 
