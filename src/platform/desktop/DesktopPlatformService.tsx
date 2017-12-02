@@ -7,7 +7,21 @@ import {
   BsSize,
 } from '../../brightSignInterfaces';
 
+import {
+  EventType,
+  ButtonPanelName,
+} from '@brightsign/bscore';
+
+import {
+  ArEventType,
+} from '../../types/index';
+
+
+import { bsp, BSP } from '../../app/bsp';
+
 const http = require('http');
+
+const srcDirectory = '/Users/tedshaffer/Desktop/bacInteractive/publish';
 
 class DesktopPlatformService {
 
@@ -18,8 +32,11 @@ class DesktopPlatformService {
     const port = 3000;
 
     const simulatedEventHandler = (request: any, response: any) => {
-      console.log(request.url);
-      response.end('launched event input server on port' + port);
+
+      const command : string = request.url.substr(1);
+      response.end('Received request: ' + command);
+
+      DesktopPlatformService.processBpEvent();
     }
 
     // https://blog.risingstack.com/your-first-node-js-http-server/
@@ -32,43 +49,32 @@ class DesktopPlatformService {
     });
   }
 
-  // static srcDirectory = '/Users/tedshaffer/Desktop/aaa_bac';            // bac classic files - for import
-  // static srcDirectory = '/Users/tedshaffer/Desktop/baconTestCard';   // bacon files - for non import
-  // static srcDirectory = '/Users/tedshaffer/Desktop/baconImportFromBac';   // bacon import from bac
-  // static srcDirectory = '/Users/tedshaffer/Desktop/ab';   // importable component for now
-  // static srcDirectory = '/Users/tedshaffer/Desktop/baconPluginPresentation';   // importable component for now
-  // static srcDirectory = '/Users/tedshaffer/Desktop/autorunTs';   // bacon files - nonImport
-  // static srcDirectory = '/Users/tedshaffer/Desktop/autorunTsInteractivity';
-  static srcDirectory = '/Users/tedshaffer/Desktop/bacInteractive/publish';
+  static processBpEvent() {
+    const event: ArEventType = {
+      EventType: EventType.Bp,
+      EventData: {
+        ButtonPanelName: ButtonPanelName.Bp900a,
+        ButtonIndex: 0
+      }
+    };
+
+    bsp.dispatchPostMessage(event);
+  }
 
   static getRootDirectory(): string {
-    return DesktopPlatformService.srcDirectory;
-    // return '/Users/tedshaffer/Desktop/baconImagesPlusVideos';
-    // return '/Users/tedshaffer/Desktop/baconTestCard';
-    // return '/Users/tedshaffer/Desktop/autorunTSFilesFromBacon';
-
-    // return '/storage/sd';
+    return srcDirectory;
   }
 
   static getTmpDirectory(): string {
-    return DesktopPlatformService.srcDirectory;
-    // return '/Users/tedshaffer/Desktop/baconImagesPlusVideos';
-    // return '/Users/tedshaffer/Desktop/baconTestCard';
-    // return '/Users/tedshaffer/Desktop/autorunTSFilesFromBacon';
-    // return '/storage/sd';
+    return srcDirectory;
   }
 
   static getPathToPool(): string {
-    return DesktopPlatformService.srcDirectory;
-    // return '/Users/tedshaffer/Desktop/baconImagesPlusVideos';
-    // return '/Users/tedshaffer/Desktop/baconTestCard';
-    //   return '/Users/tedshaffer/Desktop/autorunTSFilesFromBacon';
-    //   return '/sd:/';
+    return srcDirectory;
   }
 
   static isTickerSupported(): boolean {
     return false;
-    // return true;
   }
 
   static getDeviceInfo(): any {
@@ -165,6 +171,10 @@ class DesktopPlatformService {
 
   static getRegistryValue(registrySection : any, key : string) : string {
     return '';
+  }
+
+  static addEventHandlers(bsp: BSP) : void {
+    console.log('DesktopPlatformService: add eventHandlers');
   }
 
 }

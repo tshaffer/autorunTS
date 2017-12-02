@@ -5,10 +5,7 @@ import {
   dmGetDataFeedIdsForSign,
 } from '@brightsign/bsdatamodel';
 
-import {
-  EventType,
-  ButtonPanelName,
-} from '@brightsign/bscore';
+import PlatformService from '../platform';
 
 import {BSP} from '../app/bsp';
 import {
@@ -16,10 +13,6 @@ import {
   HSMStateData,
   ArDataFeedLUT,
 } from '../types/index';
-
-import {
-  addEventHandlers
-} from './HSMEventHandling';
 
 export class PlayerHSM extends HSM {
 
@@ -60,7 +53,7 @@ export class PlayerHSM extends HSM {
 
     console.log('initializePlayerStateMachine invoked');
 
-    addEventHandlers(this.bsp);
+    PlatformService.default.addEventHandlers(this.bsp);
 
     // ISSUE
     // would like restartBSP to return a promise, then transition to the stPlaying state once that is done.
