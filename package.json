@@ -5,6 +5,7 @@
   "main": "main.js",
   "scripts": {
     "build": "webpack --config ./webpack.config.js --watch",
+    "buildO": "webpack --config ./webpack.config.js",
     "run": "electron .",
     "tsLint": "tslint -c tslint.json 'lib/**/*.ts' 'tests/**/*.ts'"
   },

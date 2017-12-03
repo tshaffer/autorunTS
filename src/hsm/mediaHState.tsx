@@ -21,6 +21,7 @@ import {
     dmGetZoneSimplePlaylist,
     dmGetMediaStateById,
     dmGetMediaStateIdsForZone,
+    MediaStateContainerType,
   } from '@brightsign/bsdatamodel';
     
   import {
@@ -39,9 +40,23 @@ export default class MediaHState extends HState {
 
   mediaState: DmMediaState;
   
+  // rename eventLUT - indicate that it maps from events to target hState.
   eventLUT : SubscribedEvents = {};
   timeoutInterval : number = null;
   timeout : any = null;
+
+  fixTargetState() {
+    for (const event in this.eventLUT) {
+      if (this.eventLUT.hasOwnProperty(event)) {
+        const targetHState = this.eventLUT[event];
+        const targetMediaState = (targetHState as MediaHState).mediaState;
+        if (targetMediaState.contentItem.type === MediaStateContainerType.SuperState) {
+          // change this.eventLUT[prop] to point to the mediaHState which corresponds to the first state of the superState.
+        }
+        console.log(targetHState);
+      }
+    }
+  }
 
   addEvents(zoneHSM : ZoneHSM, eventIds : BsDmId[]) {
 

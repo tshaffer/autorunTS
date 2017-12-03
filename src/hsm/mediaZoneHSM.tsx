@@ -8,6 +8,7 @@ import {
   DmMediaState,
   dmGetEventIdsForMediaState,
   dmGetEventStateById,
+  dmGetMediaStateStateById,
   dmGetZoneById,
   dmGetZoneSimplePlaylist,
   dmGetMediaStateById,
@@ -18,13 +19,16 @@ import {
   LUT,
 } from '../types';
 
-import MediaHState from './mediaHState';
 import ImageState from './imageState';
+import MediaHState from './mediaHState';
+import SuperState from './superState';
 import VideoState from './videoState';
 import MRSSDataFeedState from './mrssDataFeedState';
+import { ContentItemType } from '../../../bsDataModel/node_modules/@brightsign/bscore';
 
 export class MediaZoneHSM extends ZoneHSM {
 
+  allMediaStateIds : BsDmId[] = [];
   mediaStateIdToHState : LUT = {};
 
   constructor(dispatch: Function, getState: Function, zoneId: string) {
@@ -48,11 +52,45 @@ export class MediaZoneHSM extends ZoneHSM {
     this.height = this.bsdmZone.position.height;
 
     this.initialMediaStateId = this.bsdmZone.initialMediaStateId;
-    this.mediaStateIds = dmGetMediaStateIdsForZone(this.bsdm, { id: zoneId });
-    this.mediaStates = [];
+
+    debugger;
+    this.mediaStateIds = [];
+    this.getAllMediaStateIds(this.bsdm, zoneId);
 
     // states
+    this.mediaStates = [];
+    this.addStates();
+
+    // events / transitions
+    this.mediaStateIds.forEach( (mediaStateId : BsDmId) => {
+      const hState : MediaHState = this.mediaStateIdToHState[mediaStateId];
+      const eventIds : BsDmId[] = dmGetEventIdsForMediaState(this.bsdm, { id : mediaStateId });
+      hState.addEvents(this, eventIds);
+    });
+
+    // fix up the transitions vis a vis superStates
+    this.mediaStateIds.forEach( (mediaStateId : BsDmId) => {
+      const mediaHState : MediaHState = this.mediaStateIdToHState[mediaStateId];
+      // invoke a method on the mediaHState to fix the targets of its transitions when they the target is a superState.
+      mediaHState.fixTargetState();
+    });      
+  }
+
+  getAllMediaStateIds(bsdm : any, containerId : BsDmId) {
+    const mediaStateIds : BsDmId[] = dmGetMediaStateIdsForZone(bsdm, { id: containerId });
+    mediaStateIds.forEach( (mediaStateId) => {
+      this.mediaStateIds.push(mediaStateId);
+      const mediaState : DmMediaState = dmGetMediaStateStateById(bsdm, { id : mediaStateId });
+      if (mediaState.contentItem.type === ContentItemType.SuperState) {
+        this.getAllMediaStateIds(bsdm, mediaState.id);
+      }
+    })
+  }
+
+  addStates() {
+
     let newState : MediaHState = null;
+
     this.mediaStateIds.forEach( (mediaStateId : BsDmId, index : number) => {
       const bsdmMediaState : DmMediaState = dmGetMediaStateById(this.bsdm, { id : mediaStateId});
       if (bsdmMediaState.contentItem.type === 'Image') {
@@ -61,19 +99,11 @@ export class MediaZoneHSM extends ZoneHSM {
         newState = new VideoState(this, bsdmMediaState);
       } else if (bsdmMediaState.contentItem.type === 'MrssFeed') {
         newState = new MRSSDataFeedState(this, bsdmMediaState);
-      }      
+      } else if (bsdmMediaState.contentItem.type === 'SuperState') {
+        newState = new SuperState(this, bsdmMediaState);        
+      }     
       this.mediaStates.push(newState);
-
       this.mediaStateIdToHState[mediaStateId] = newState;
-    });
-
-    // events / transitions
-    this.mediaStateIds.forEach( (mediaStateId : BsDmId, index : number) => {
-
-      const targetHState : MediaHState = this.mediaStateIdToHState[mediaStateId];
-
-      const eventIds : BsDmId[] = dmGetEventIdsForMediaState(this.bsdm, { id : mediaStateId });
-      targetHState.addEvents(this, eventIds);
     });
   }
 
