@@ -19,7 +19,6 @@ import { setActiveMediaState } from '../store/activeMediaStates';
 
 export default class ImageState extends MediaHState {
 
-  bsdm : DmState;
   stateMachine : ZoneHSM;
 
   constructor(zoneHSM : ZoneHSM, mediaState : DmMediaState ) {

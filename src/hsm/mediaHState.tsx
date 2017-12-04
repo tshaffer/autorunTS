@@ -9,9 +9,11 @@ import {
     DmcEvent,
     DmcMediaState,
     DmcTransition,
+    dmGetMediaStateByName,
     DmMediaState,
     DmTransition,
     DmState,
+    DmSuperStateContentItem,
     DmTimer,
     dmGetEventIdsForMediaState,
     dmGetEventStateById,
@@ -35,23 +37,31 @@ import { ZoneHSM } from './zoneHSM';
 import { MediaZoneHSM } from './mediaZoneHSM';
 
 import VideoState from './videoState';
+import { ContentItemType } from '../../../bsDataModel/node_modules/@brightsign/bscore';
 
 export default class MediaHState extends HState {
 
   mediaState: DmMediaState;
+  bsdm : DmState;
   
   // rename eventLUT - indicate that it maps from events to target hState.
   eventLUT : SubscribedEvents = {};
   timeoutInterval : number = null;
   timeout : any = null;
 
+  // if the target state is a superState, change it to the initial state of the targetState
   fixTargetState() {
     for (const event in this.eventLUT) {
       if (this.eventLUT.hasOwnProperty(event)) {
         const targetHState = this.eventLUT[event];
         const targetMediaState = (targetHState as MediaHState).mediaState;
-        if (targetMediaState.contentItem.type === MediaStateContainerType.SuperState) {
-          // change this.eventLUT[prop] to point to the mediaHState which corresponds to the first state of the superState.
+        console.log(MediaStateContainerType.SuperState);
+        if (targetMediaState.contentItem.type === ContentItemType.SuperState) {
+          const superStateContentItem : DmSuperStateContentItem = targetMediaState.contentItem as DmSuperStateContentItem;
+          const initialMediaState : DmMediaState = dmGetMediaStateByName(this.bsdm, 
+            { name : superStateContentItem.initialMediaStateName});
+          const initialMediaHState : HState = (this.stateMachine as MediaZoneHSM).mediaStateIdToHState[initialMediaState.id];
+          this.eventLUT[event] = initialMediaHState;
         }
         console.log(targetHState);
       }

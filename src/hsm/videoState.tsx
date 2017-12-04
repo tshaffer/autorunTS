@@ -24,7 +24,6 @@ import {
 
 export default class VideoState extends MediaHState {
 
-  bsdm : DmState;
   dispatch : Function;
   stateMachine : ZoneHSM;
 

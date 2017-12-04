@@ -12,7 +12,6 @@ import {TickerZoneHSM} from './tickerZoneHSM';
 export default class RSSDataFeedState extends MediaHState {
 
   bsdmState: DmMediaState;
-  bsdm : DmState;
   nextState : HState;
 
   constructor(zoneHSM: TickerZoneHSM, bsdmState: DmMediaState) {

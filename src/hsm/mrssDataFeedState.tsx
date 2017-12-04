@@ -21,7 +21,6 @@ import {HSMStateData, ArEventType} from '../types/index';
 
 export default class MRSSDataFeedState extends MediaHState {
 
-  bsdm : DmState;
   bsdmState: DmMediaState;
   dataFeed : MrssDataFeed;
   currentFeed : MRSSFeed;
