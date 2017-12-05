@@ -19,7 +19,9 @@ import {
 
 import { bsp, BSP } from '../../app/bsp';
 
-const http = require('http');
+// const http = require('http');
+const express = require('express')
+const app = express();
 
 const srcDirectory = '/Users/tedshaffer/Desktop/bacInteractive/publish';
 
@@ -31,22 +33,42 @@ class DesktopPlatformService {
 
     const port = 3000;
 
-    const simulatedEventHandler = (request: any, response: any) => {
+    // const simulatedEventHandler = (request: any, response: any) => {
+    //
+    //   const command : string = request.url.substr(1);
+    //   response.end('Received request: ' + command);
+    //
+    //   console.log('Received command: ' + command);
+    //
+    //   DesktopPlatformService.processBpEvent();
+    // }
 
-      const command : string = request.url.substr(1);
-      response.end('Received request: ' + command);
+    // app.get('/', function (req : any, res : any) {
+    //   debugger;
+    // });
 
-      DesktopPlatformService.processBpEvent();
-    }
+    app.get('/a', function (req : any, res : any) {
+      console.log('received /a');
+      // debugger;
+    });
+
+    app.get('/cmd', function (req : any, res : any) {
+      console.log('received /cmd');
+      // debugger;
+    });
+
+    app.listen(3000, function () {
+      console.log('autorunTs listening on port 3000!')
+    })
 
     // https://blog.risingstack.com/your-first-node-js-http-server/
-    const simulatedEventServer = http.createServer(simulatedEventHandler);
-    simulatedEventServer.listen(port, (err: any) => {
-      if (err) {
-        return console.log('Error launching simulatedEventServer', err);
-      }
-      console.log(`simulatedEventServer is listening on ${port}`);
-    });
+    // const simulatedEventServer = http.createServer(simulatedEventHandler);
+    // simulatedEventServer.listen(port, (err: any) => {
+    //   if (err) {
+    //     return console.log('Error launching simulatedEventServer', err);
+    //   }
+    //   console.log(`simulatedEventServer is listening on ${port}`);
+    // });
   }
 
   static processBpEvent() {
