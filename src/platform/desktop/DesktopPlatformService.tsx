@@ -20,6 +20,8 @@ import {
 import { bsp, BSP } from '../../app/bsp';
 
 const http = require('http');
+const url = require('url');
+const querystring = require('querystring');
 
 const srcDirectory = '/Users/tedshaffer/Desktop/bacInteractive/publish';
 
@@ -33,10 +35,24 @@ class DesktopPlatformService {
 
     const simulatedEventHandler = (request: any, response: any) => {
 
-      const command : string = request.url.substr(1);
-      response.end('Received request: ' + command);
+      const rawUrl : string = request.url;
+      console.log('rawUrl: ', rawUrl);
 
-      DesktopPlatformService.processBpEvent();
+      const parsedUrl = url.parse(rawUrl);
+      console.log('parsedUrl: ', parsedUrl);
+
+      const parsedQs = querystring.parse(parsedUrl.query);
+      console.log('parsedQs: ', parsedQs);
+
+      const commandStr : string = parsedQs.command;
+      console.log(commandStr);
+      const command : any = JSON.parse(commandStr);
+      console.log(command);
+      DesktopPlatformService.processInputEvent(command);
+      // const command : string = request.url.substr(1);
+      // response.end('Received request: ' + command);
+      //
+      // DesktopPlatformService.processBpEvent();
     }
 
     // https://blog.risingstack.com/your-first-node-js-http-server/
@@ -49,17 +65,54 @@ class DesktopPlatformService {
     });
   }
 
-  static processBpEvent() {
-    const event: ArEventType = {
-      EventType: EventType.Bp,
-      EventData: {
-        ButtonPanelName: ButtonPanelName.Bp900a,
-        ButtonIndex: 0
+  static getButtonPanelName(bpParameters : any) : ButtonPanelName {
+    switch (bpParameters.buttonPanelType) {
+      case 'bp900': {
+        switch (bpParameters.buttonPanelIndex) {
+          case 0: {
+            return ButtonPanelName.Bp900a;
+          }
+          case 1: {
+            return ButtonPanelName.Bp900b;
+          }
+        }
+        break;
       }
-    };
-
-    bsp.dispatchPostMessage(event);
+      case 'bp200': {
+        break;
+      }
+    }
   }
+
+  static processInputEvent(inputEvent : any) {
+    switch (inputEvent.command) {
+      case 'bp': {
+        // send command:  {"command":"bp","parameters":{"buttonPanelType":"bp900","buttonPanelIndex":0,"buttonNumber":7}}
+        const bpParameters : any = inputEvent.parameters;
+        const buttonPanelName = DesktopPlatformService.getButtonPanelName(bpParameters);
+        const event: ArEventType = {
+          EventType: EventType.Bp,
+          EventData: {
+            ButtonPanelName: buttonPanelName,
+            ButtonIndex: bpParameters.buttonNumber
+          }
+        };
+        bsp.dispatchPostMessage(event);    
+      }
+    }
+  }
+
+  // static processBpEvent() {
+  //   const event: ArEventType = {
+  //     EventType: EventType.Bp,
+  //     EventData: {
+  //       ButtonPanelName: ButtonPanelName.Bp900a,
+  //       ButtonIndex: 0
+  //     }
+  //   };
+
+  //   bsp.dispatchPostMessage(event);
+  // }
 
   static getRootDirectory(): string {
     return srcDirectory;
