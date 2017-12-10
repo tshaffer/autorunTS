@@ -53,6 +53,8 @@ class DesktopPlatformService {
       // response.end('Received request: ' + command);
       //
       // DesktopPlatformService.processBpEvent();
+
+      response.end();
     }
 
     // https://blog.risingstack.com/your-first-node-js-http-server/
