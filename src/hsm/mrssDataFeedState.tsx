@@ -4,6 +4,8 @@ import {
   DmState,
 } from '@brightsign/bsdatamodel';
 
+import { HState } from './HSM';
+
 import MediaHState from './mediaHState';
 
 import { ZoneHSM } from './zoneHSM';
@@ -28,13 +30,13 @@ export default class MRSSDataFeedState extends MediaHState {
   displayIndex : number;
   stateMachine : ZoneHSM;
 
-  constructor(zoneHSM: ZoneHSM, bsdmState: DmMediaState) {
+  constructor(zoneHSM: ZoneHSM, superHState: HState, bsdmState: DmMediaState) {
 
     super(zoneHSM, bsdmState.id);
     this.bsdm = zoneHSM.bsdm;
     this.bsdmState = bsdmState;
 
-    this.superState = zoneHSM.stTop;
+    this.superState = superHState;
 
     this.HStateEventHandler = this.STDisplayingMRSSDataFeedEventHandler;
 

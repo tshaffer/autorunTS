@@ -9,6 +9,8 @@ import {
   DmState,
 } from '@brightsign/bsdatamodel';
 
+import { HState } from './HSM';
+
 import MediaHState from './mediaHState';
 
 import { ZoneHSM } from './zoneHSM';
@@ -27,13 +29,13 @@ export default class VideoState extends MediaHState {
   dispatch : Function;
   stateMachine : ZoneHSM;
 
-  constructor(zoneHSM : ZoneHSM, mediaState : DmMediaState) {
+  constructor(zoneHSM : ZoneHSM, superHState: HState, mediaState : DmMediaState) {
 
     super(zoneHSM, mediaState.id);
     this.bsdm = zoneHSM.bsdm;
     this.mediaState = mediaState;
 
-    this.superState = zoneHSM.stTop;
+    this.superState = superHState;
 
     this.HStateEventHandler = this.STDisplayingVideoEventHandler;
   }

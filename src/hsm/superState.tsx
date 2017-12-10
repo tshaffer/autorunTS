@@ -1,11 +1,15 @@
+import { HState } from './HSM';
+
 import {
   EventType,
   ButtonPanelName,
 } from '@brightsign/bscore';
 
 import {
+  BsDmId,
   DmMediaState,
   DmState,
+  dmGetMediaStateIdsForZone,
 } from '@brightsign/bsdatamodel';
 
 import {
@@ -21,14 +25,19 @@ export default class SuperState extends MediaHState {
 
   stateMachine : ZoneHSM;
 
-  constructor(zoneHSM : ZoneHSM, mediaState : DmMediaState ) {
+  constructor(zoneHSM : ZoneHSM, superHState: HState, mediaState : DmMediaState ) {
 
       super(zoneHSM, mediaState.id);
       this.bsdm = zoneHSM.bsdm;
       this.mediaState = mediaState;
 
-      this.superState = zoneHSM.stTop;
+      debugger;
+      const state : DmState = this.bsdm;
+      const id : BsDmId = this.id;
+      const mediaStateIds : BsDmId[] = dmGetMediaStateIdsForZone(state, { id });
 
+      this.superState = superHState;
+  
       this.HStateEventHandler = this.STSuperStateEventHandler;
   }
 
