@@ -23,6 +23,7 @@ import {
 
 import ImageState from './imageState';
 import MediaHState from './mediaHState';
+import MediaList from './mediaList';
 import SuperState from './superState';
 import VideoState from './videoState';
 import MRSSDataFeedState from './mrssDataFeedState';
@@ -60,7 +61,12 @@ export class MediaZoneHSM extends ZoneHSM {
 
     // states
     this.mediaHStates = [];
-    this.addMediaHStates(this.stTop, zoneId);
+    dispatch(this.addMediaHStates(this.stTop, zoneId));
+    
+    // TODO - don't like this
+    this.bsdm = getState().bsdm;
+
+    console.log(this.bsdm);
 
     // // events / transitions
     this.mediaStateIds.forEach( (mediaStateId : BsDmId) => {
@@ -78,41 +84,51 @@ export class MediaZoneHSM extends ZoneHSM {
   }
 
   addMediaHStates(superHState: HState, containerId : BsDmId) {
-    const mediaStateIds : BsDmId[] = dmGetMediaStateIdsForZone(this.bsdm, { id: containerId });
-    mediaStateIds.forEach( (mediaStateId) => {
-      this.addMediaHState(superHState, containerId, mediaStateId);
-    });      
+    return (dispatch: Function) => {
+      const mediaStateIds : BsDmId[] = dmGetMediaStateIdsForZone(this.bsdm, { id: containerId });
+      mediaStateIds.forEach( (mediaStateId) => {
+        dispatch(this.addMediaHState(superHState, containerId, mediaStateId));
+      });        
+    };
   }
 
   addMediaHState(superHState: HState, containerId: BsDmId, mediaStateId: BsDmId) {
 
-    let hState : MediaHState = null;
-    
-    const bsdmMediaState : DmMediaState = dmGetMediaStateById(this.bsdm, { id : mediaStateId});
-    switch (bsdmMediaState.contentItem.type) {
-      case ContentItemType.Image: {
-        hState = new ImageState(this, superHState, bsdmMediaState);
-        break;
+    return (dispatch: Function) => {
+      let hState : MediaHState = null;
+      
+      const mediaState : DmMediaState = dmGetMediaStateById(this.bsdm, { id : mediaStateId});
+      switch (mediaState.contentItem.type) {
+        case ContentItemType.Image: {
+          hState = new ImageState(this, superHState, mediaState);
+          break;
+        }
+        case ContentItemType.Video: {
+          hState = new VideoState(this, superHState, mediaState);
+          break;
+        }
+        case ContentItemType.MrssFeed: {
+          hState = new MRSSDataFeedState(this, superHState, mediaState);
+          break;
+        }
+        case ContentItemType.SuperState: {
+          hState = new SuperState(this, superHState, mediaState);
+          dispatch(this.addMediaHStates(hState, mediaState.id));
+          break;
+        }
+        case ContentItemType.MediaList: {
+          hState = new MediaList(this, superHState, mediaState);
+          dispatch(this.addMediaHStates(hState, mediaState.id));
+          dispatch((hState as MediaList).setEvents());
+          break;
+        }
+        default: {
+          debugger;
+        }
       }
-      case ContentItemType.Video: {
-        hState = new VideoState(this, superHState, bsdmMediaState);
-        break;
-      }
-      case ContentItemType.MrssFeed: {
-        hState = new MRSSDataFeedState(this, superHState, bsdmMediaState);
-        break;
-      }
-      case ContentItemType.SuperState: {
-        hState = new SuperState(this, superHState, bsdmMediaState);
-        this.addMediaHStates(hState, bsdmMediaState.id);
-        break;
-      }
-      default: {
-        debugger;
-      }
-    }
-    this.mediaHStates.push(hState);
-    this.mediaStateIdToHState[mediaStateId] = hState;
+      this.mediaHStates.push(hState);
+      this.mediaStateIdToHState[mediaStateId] = hState;
+    };
 }
 
   getAllMediaStateIds(bsdm : any, containerId : BsDmId) {
@@ -120,7 +136,7 @@ export class MediaZoneHSM extends ZoneHSM {
     mediaStateIds.forEach( (mediaStateId) => {
       this.mediaStateIds.push(mediaStateId);
       const mediaState : DmMediaState = dmGetMediaStateStateById(bsdm, { id : mediaStateId });
-      if (mediaState.contentItem.type === ContentItemType.SuperState) {
+      if (mediaState.contentItem.type === ContentItemType.SuperState || mediaState.contentItem.type === ContentItemType.MediaList) {
         this.getAllMediaStateIds(bsdm, mediaState.id);
       }
     })

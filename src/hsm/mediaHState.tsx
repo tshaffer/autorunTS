@@ -9,7 +9,9 @@ import {
     DmcEvent,
     DmcMediaState,
     DmcTransition,
+    dmGetMediaStateStateById,
     dmGetMediaStateByName,
+    DmMediaListContentItem,
     DmMediaState,
     DmTransition,
     DmState,
@@ -49,7 +51,7 @@ export default class MediaHState extends HState {
   timeoutInterval : number = null;
   timeout : any = null;
 
-  // if the target state is a superState, change it to the initial state of the targetState
+  // if the target state is a superState or mediaList, change it to the initial state of the targetState
   fixTargetState() {
     for (const event in this.eventLUT) {
       if (this.eventLUT.hasOwnProperty(event)) {
@@ -63,7 +65,13 @@ export default class MediaHState extends HState {
           const initialMediaHState : HState = (this.stateMachine as MediaZoneHSM).mediaStateIdToHState[initialMediaState.id];
           this.eventLUT[event] = initialMediaHState;
         }
-        console.log(targetHState);
+        else if (targetMediaState.contentItem.type === ContentItemType.MediaList) {
+          const mediaListContentItem : DmMediaListContentItem = targetMediaState.contentItem as DmMediaListContentItem;
+          const initialMediaStateId :BsDmId = mediaListContentItem.mediaStates[0];
+          const initialMediaState : DmMediaState = dmGetMediaStateById(this.bsdm, { id : initialMediaStateId});
+          const initialMediaHState : HState = (this.stateMachine as MediaZoneHSM).mediaStateIdToHState[initialMediaState.id];
+          this.eventLUT[event] = initialMediaHState;
+        }
       }
     }
   }
@@ -106,18 +114,28 @@ export default class MediaHState extends HState {
     // iterate through the events for which this state has transitions - if any match the supplied event,
     // execute the associated transition
 
-    const eventList : DmcEvent[] = (this.mediaState as DmcMediaState).eventList;
-
-    for (let stateEvent of eventList) {
-      const bsEventKey : string = this.getBsEventKey(event);
-      // TODO - hack to workaround unfinished code
-      if (bsEventKey !== '') {
-        if (this.eventLUT.hasOwnProperty(bsEventKey)) {
-          stateData.nextState = this.eventLUT[bsEventKey];
-          return 'TRANSITION';
-        }
+    // TODO - is this right? not iterating through events. just looking in eventLUT
+    const bsEventKey : string = this.getBsEventKey(event);
+    // TODO - hack to workaround unfinished code
+    if (bsEventKey !== '') {
+      if (this.eventLUT.hasOwnProperty(bsEventKey)) {
+        stateData.nextState = this.eventLUT[bsEventKey];
+        return 'TRANSITION';
       }
     }
+
+    // const eventList : DmcEvent[] = (this.mediaState as DmcMediaState).eventList;
+
+    // for (let stateEvent of eventList) {
+    //   const bsEventKey : string = this.getBsEventKey(event);
+    //   // TODO - hack to workaround unfinished code
+    //   if (bsEventKey !== '') {
+    //     if (this.eventLUT.hasOwnProperty(bsEventKey)) {
+    //       stateData.nextState = this.eventLUT[bsEventKey];
+    //       return 'TRANSITION';
+    //     }
+    //   }
+    // }
 
     stateData.nextState = this.superState;
     return 'SUPER';
