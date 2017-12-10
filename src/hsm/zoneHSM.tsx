@@ -27,7 +27,7 @@ export class ZoneHSM extends HSM {
   height : number;
   initialMediaStateId : string;
   mediaStateIds : BsDmId[];
-  mediaStates : MediaHState[];
+  mediaHStates : MediaHState[];
 
   constructor(dispatch: Function, getState : Function, zoneId : string) {
     super();

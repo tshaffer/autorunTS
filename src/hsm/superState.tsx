@@ -31,7 +31,6 @@ export default class SuperState extends MediaHState {
       this.bsdm = zoneHSM.bsdm;
       this.mediaState = mediaState;
 
-      debugger;
       const state : DmState = this.bsdm;
       const id : BsDmId = this.id;
       const mediaStateIds : BsDmId[] = dmGetMediaStateIdsForZone(state, { id });
@@ -45,12 +44,13 @@ export default class SuperState extends MediaHState {
     
     if (event.EventType === 'ENTRY_SIGNAL') {
         console.log(this.id + ': entry signal');
-        this.stateMachine.dispatch(setActiveMediaState(this.stateMachine.id, this.id));
+        // this.stateMachine.dispatch(setActiveMediaState(this.stateMachine.id, this.id));
         this.launchTimer();
         return 'HANDLED';
     } else if (event.EventType === 'EXIT_SIGNAL') {
       this.mediaHStateExitHandler();
     } else {
+      console.log('superState received event: ', event);
       return this.mediaHStateEventHandler(event, stateData);
     }
 

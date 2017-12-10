@@ -132,7 +132,7 @@ export class TickerZoneHSM extends ZoneHSM {
     // in autorun classic, this is done in newPlaylist as called from newZoneHSM
     const self = this;
     this.mediaStateIds = dmGetZoneSimplePlaylist(this.bsdm, { id: zoneId });
-    this.mediaStates = [];
+    this.mediaHStates = [];
     this.rssDataFeedItems = [];
 
     this.mediaStateIds.forEach( (mediaStateId) => {
@@ -161,7 +161,7 @@ export class TickerZoneHSM extends ZoneHSM {
         debugger;
       }
 
-      this.mediaStates.push(newState);
+      this.mediaHStates.push(newState);
 
     });
   }

@@ -52,6 +52,7 @@ export default class VideoState extends MediaHState {
     } else if (event.EventType && event.EventType === 'EXIT_SIGNAL') {
       this.mediaHStateExitHandler();
     } else if (event.EventType === EventType.MediaEnd) {
+      console.log('videoState received MediaEnd event');
       const eventList : DmcEvent[] = (this.mediaState as DmcMediaState).eventList;
       const bsEventKey : string = this.getBsEventKey(event);
       if (this.eventLUT.hasOwnProperty(bsEventKey)) {
@@ -59,6 +60,7 @@ export default class VideoState extends MediaHState {
         return 'TRANSITION';
       }
     } else {
+      console.log('videoState received event: ', event);
       return this.mediaHStateEventHandler(event, stateData);
     }
 

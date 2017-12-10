@@ -41,7 +41,7 @@ export default function(state : ActiveMediaStatesShape = initialState, action : 
             const { zoneId, mediaStateId } = action.payload;
             newState.activeMediaStateIdByZone[zoneId] = mediaStateId;
 
-            console.log(newState);
+            // console.log(newState);
 
             return newState;
         }

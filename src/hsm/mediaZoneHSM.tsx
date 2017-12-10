@@ -55,40 +55,36 @@ export class MediaZoneHSM extends ZoneHSM {
 
     this.initialMediaStateId = this.bsdmZone.initialMediaStateId;
 
-    // debugger;
-    // this.mediaStateIds = [];
-    // this.getAllMediaStateIds(this.bsdm, zoneId);
+    this.mediaStateIds = [];
+    this.getAllMediaStateIds(this.bsdm, zoneId);
 
     // states
-    this.mediaStates = [];
-    debugger;
-    this.addMediaStates(this.stTop, zoneId);
-    debugger;
-    // this.addStates();
+    this.mediaHStates = [];
+    this.addMediaHStates(this.stTop, zoneId);
 
     // // events / transitions
-    // this.mediaStateIds.forEach( (mediaStateId : BsDmId) => {
-    //   const hState : MediaHState = this.mediaStateIdToHState[mediaStateId];
-    //   const eventIds : BsDmId[] = dmGetEventIdsForMediaState(this.bsdm, { id : mediaStateId });
-    //   hState.addEvents(this, eventIds);
-    // });
+    this.mediaStateIds.forEach( (mediaStateId : BsDmId) => {
+      const hState : MediaHState = this.mediaStateIdToHState[mediaStateId];
+      const eventIds : BsDmId[] = dmGetEventIdsForMediaState(this.bsdm, { id : mediaStateId });
+      hState.addEvents(this, eventIds);
+    });
 
     // // fix up the transitions vis a vis superStates
-    // this.mediaStateIds.forEach( (mediaStateId : BsDmId) => {
-    //   const mediaHState : MediaHState = this.mediaStateIdToHState[mediaStateId];
-    //   // invoke a method on the mediaHState to fix the targets of its transitions when they the target is a superState.
-    //   mediaHState.fixTargetState();
-    // });      
-  }
-
-  addMediaStates(superHState: HState, containerId : BsDmId) {
-    const mediaStateIds : BsDmId[] = dmGetMediaStateIdsForZone(this.bsdm, { id: containerId });
-    mediaStateIds.forEach( (mediaStateId) => {
-      this.addMediaState(superHState, containerId, mediaStateId);
+    this.mediaStateIds.forEach( (mediaStateId : BsDmId) => {
+      const mediaHState : MediaHState = this.mediaStateIdToHState[mediaStateId];
+      // invoke a method on the mediaHState to fix the targets of its transitions when the target is a superState.
+      mediaHState.fixTargetState();
     });      
   }
 
-  addMediaState(superHState: HState, containerId: BsDmId, mediaStateId: BsDmId) {
+  addMediaHStates(superHState: HState, containerId : BsDmId) {
+    const mediaStateIds : BsDmId[] = dmGetMediaStateIdsForZone(this.bsdm, { id: containerId });
+    mediaStateIds.forEach( (mediaStateId) => {
+      this.addMediaHState(superHState, containerId, mediaStateId);
+    });      
+  }
+
+  addMediaHState(superHState: HState, containerId: BsDmId, mediaStateId: BsDmId) {
 
     let hState : MediaHState = null;
     
@@ -108,20 +104,16 @@ export class MediaZoneHSM extends ZoneHSM {
       }
       case ContentItemType.SuperState: {
         hState = new SuperState(this, superHState, bsdmMediaState);
-        this.addMediaStates(hState, bsdmMediaState.id);
+        this.addMediaHStates(hState, bsdmMediaState.id);
         break;
       }
       default: {
         debugger;
       }
     }
-    this.mediaStates.push(hState);
+    this.mediaHStates.push(hState);
     this.mediaStateIdToHState[mediaStateId] = hState;
 }
-
-
-
-
 
   getAllMediaStateIds(bsdm : any, containerId : BsDmId) {
     const mediaStateIds : BsDmId[] = dmGetMediaStateIdsForZone(bsdm, { id: containerId });
@@ -134,32 +126,12 @@ export class MediaZoneHSM extends ZoneHSM {
     })
   }
 
-  // addStates() {
-
-  //   let newState : MediaHState = null;
-
-  //   this.mediaStateIds.forEach( (mediaStateId : BsDmId, index : number) => {
-  //     const bsdmMediaState : DmMediaState = dmGetMediaStateById(this.bsdm, { id : mediaStateId});
-  //     if (bsdmMediaState.contentItem.type === 'Image') {
-  //       newState = new ImageState(this, bsdmMediaState);
-  //     } else if (bsdmMediaState.contentItem.type === 'Video') {
-  //       newState = new VideoState(this, bsdmMediaState);
-  //     } else if (bsdmMediaState.contentItem.type === 'MrssFeed') {
-  //       newState = new MRSSDataFeedState(this, bsdmMediaState);
-  //     } else if (bsdmMediaState.contentItem.type === 'SuperState') {
-  //       newState = new SuperState(this, bsdmMediaState);        
-  //     }     
-  //     this.mediaStates.push(newState);
-  //     this.mediaStateIdToHState[mediaStateId] = newState;
-  //   });
-  // }
-
   videoOrImagesZoneConstructor() {
     console.log('VideoOrImagesZoneConstructor invoked');
 
     // const mediaStateIds = dmGetZoneSimplePlaylist(this.bsdm, { id: this.zoneId });
     // should really look at initialMediaStateId, but the following should work for non interactive playlists
-    this.activeState = this.mediaStates[0];
+    this.activeState = this.mediaHStates[0];
   }
 
   videoOrImagesZoneGetInitialState() {
