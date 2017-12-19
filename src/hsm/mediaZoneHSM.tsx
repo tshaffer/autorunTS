@@ -17,9 +17,7 @@ import {
   dmGetMediaStateIdsForZone,
 } from '@brightsign/bsdatamodel';
 
-import {
-  LUT,
-} from '../types';
+import { LUT } from '../types';
 
 import ImageState from './imageState';
 import MediaHState from './mediaHState';
@@ -43,7 +41,6 @@ export class MediaZoneHSM extends ZoneHSM {
     this.constructorHandler = this.videoOrImagesZoneConstructor;
     this.initialPseudoStateHandler = this.videoOrImagesZoneGetInitialState;
 
-    // build playlist
     this.bsdmZone = dmGetZoneById(this.bsdm, { id: zoneId });
 
     this.id = this.bsdmZone.id;
@@ -59,16 +56,15 @@ export class MediaZoneHSM extends ZoneHSM {
     this.mediaStateIds = [];
     this.getAllMediaStateIds(this.bsdm, zoneId);
 
-    // states
+    // add states
     this.mediaHStates = [];
     dispatch(this.addMediaHStates(this.stTop, zoneId));
     
     // TODO - don't like this
+    // update bsdm as changes may have occurred when adding mediaHStates.
     this.bsdm = getState().bsdm;
 
-    console.log(this.bsdm);
-
-    // // events / transitions
+    // events / transitions
     this.mediaStateIds.forEach( (mediaStateId : BsDmId) => {
       const hState : MediaHState = this.mediaStateIdToHState[mediaStateId];
       const eventIds : BsDmId[] = dmGetEventIdsForMediaState(this.bsdm, { id : mediaStateId });
@@ -79,7 +75,7 @@ export class MediaZoneHSM extends ZoneHSM {
     this.mediaStateIds.forEach( (mediaStateId : BsDmId) => {
       const mediaHState : MediaHState = this.mediaStateIdToHState[mediaStateId];
       // invoke a method on the mediaHState to fix the targets of its transitions when the target is a superState.
-      mediaHState.fixTargetState();
+      mediaHState.updateTransitionsToContainer();
     });      
   }
 

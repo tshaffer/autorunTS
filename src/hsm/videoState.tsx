@@ -55,8 +55,8 @@ export default class VideoState extends MediaHState {
       console.log('videoState received MediaEnd event');
       const eventList : DmcEvent[] = (this.mediaState as DmcMediaState).eventList;
       const bsEventKey : string = this.getBsEventKey(event);
-      if (this.eventLUT.hasOwnProperty(bsEventKey)) {
-        stateData.nextState = this.eventLUT[bsEventKey];
+      if (this.mapEventToHState.hasOwnProperty(bsEventKey)) {
+        stateData.nextState = this.mapEventToHState[bsEventKey];
         return 'TRANSITION';
       }
     } else {
