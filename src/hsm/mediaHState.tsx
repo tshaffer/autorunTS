@@ -4,18 +4,18 @@ import {
 
 import {
     BsDmId,
-    DmBpEventData,
+    // DmBpEventData,
     DmEvent,
     DmcEvent,
     DmcMediaState,
     DmcTransition,
     dmGetMediaStateStateById,
     dmGetMediaStateByName,
-    DmMediaListContentItem,
+    // DmMediaListContentItem,
     DmMediaState,
     DmTransition,
     DmState,
-    DmSuperStateContentItem,
+    // DmSuperStateContentItem,
     DmTimer,
     dmGetEventIdsForMediaState,
     dmGetEventStateById,
@@ -39,7 +39,7 @@ import { ZoneHSM } from './zoneHSM';
 import { MediaZoneHSM } from './mediaZoneHSM';
 
 import VideoState from './videoState';
-import { ContentItemType } from '../../../bsDataModel/node_modules/@brightsign/bscore';
+import { ContentItemType } from '@brightsign/bscore';
 
 export default class MediaHState extends HState {
 
@@ -57,20 +57,20 @@ export default class MediaHState extends HState {
       if (this.mapEventToHState.hasOwnProperty(event)) {
         const targetHState = this.mapEventToHState[event];
         const targetMediaState = (targetHState as MediaHState).mediaState;
-        if (targetMediaState.contentItem.type === ContentItemType.SuperState) {
-          const superStateContentItem : DmSuperStateContentItem = targetMediaState.contentItem as DmSuperStateContentItem;
-          const initialMediaState : DmMediaState = dmGetMediaStateByName(this.bsdm, 
-            { name : superStateContentItem.initialMediaStateName});
-          const initialMediaHState : HState = (this.stateMachine as MediaZoneHSM).mediaStateIdToHState[initialMediaState.id];
-          this.mapEventToHState[event] = initialMediaHState;
-        }
-        else if (targetMediaState.contentItem.type === ContentItemType.MediaList) {
-          const mediaListContentItem : DmMediaListContentItem = targetMediaState.contentItem as DmMediaListContentItem;
-          const initialMediaStateId :BsDmId = mediaListContentItem.mediaStates[0];
-          const initialMediaState : DmMediaState = dmGetMediaStateById(this.bsdm, { id : initialMediaStateId});
-          const initialMediaHState : HState = (this.stateMachine as MediaZoneHSM).mediaStateIdToHState[initialMediaState.id];
-          this.mapEventToHState[event] = initialMediaHState;
-        }
+        // if (targetMediaState.contentItem.type === ContentItemType.SuperState) {
+        //   const superStateContentItem : DmSuperStateContentItem = targetMediaState.contentItem as DmSuperStateContentItem;
+        //   const initialMediaState : DmMediaState = dmGetMediaStateByName(this.bsdm,
+        //     { name : superStateContentItem.initialMediaStateName});
+        //   const initialMediaHState : HState = (this.stateMachine as MediaZoneHSM).mediaStateIdToHState[initialMediaState.id];
+        //   this.mapEventToHState[event] = initialMediaHState;
+        // }
+        // else if (targetMediaState.contentItem.type === ContentItemType.MediaList) {
+        //   const mediaListContentItem : DmMediaListContentItem = targetMediaState.contentItem as DmMediaListContentItem;
+        //   const initialMediaStateId :BsDmId = mediaListContentItem.mediaStates[0];
+        //   const initialMediaState : DmMediaState = dmGetMediaStateById(this.bsdm, { id : initialMediaStateId});
+        //   const initialMediaHState : HState = (this.stateMachine as MediaZoneHSM).mediaStateIdToHState[initialMediaState.id];
+        //   this.mapEventToHState[event] = initialMediaHState;
+        // }
       }
     }
   }
@@ -166,35 +166,35 @@ export default class MediaHState extends HState {
     console.log('getHState, event type is: ' + event.type);
 
     switch (event.type) {
-      case EventType.Bp: {
-        // TODO - refine
-        const eventData : DmBpEventData = event.data as DmBpEventData;
-
-        switch (eventData.buttonPanelType) {
-          case 'BP900': {
-            switch (eventData.buttonPanelIndex) {
-              case 0: {
-                eventKey = 'bp900a' + '-' + eventData.buttonNumber.toString();
-                break;                
-              }
-              case 1: {
-                eventKey = 'bp900b' + '-' + eventData.buttonNumber.toString();
-                break;                
-              }
-              default: {
-                // TODO - implement me
-                debugger;
-              }
-            }
-            break;
-          }
-          case 'BP200': {
-              // TODO - implement me
-            debugger;
-          }
-        }
-        break;
-      }
+      // case EventType.Bp: {
+      //   // TODO - refine
+      //   const eventData : DmBpEventData = event.data as DmBpEventData;
+      //
+      //   switch (eventData.buttonPanelType) {
+      //     case 'BP900': {
+      //       switch (eventData.buttonPanelIndex) {
+      //         case 0: {
+      //           eventKey = 'bp900a' + '-' + eventData.buttonNumber.toString();
+      //           break;
+      //         }
+      //         case 1: {
+      //           eventKey = 'bp900b' + '-' + eventData.buttonNumber.toString();
+      //           break;
+      //         }
+      //         default: {
+      //           // TODO - implement me
+      //           debugger;
+      //         }
+      //       }
+      //       break;
+      //     }
+      //     case 'BP200': {
+      //         // TODO - implement me
+      //       debugger;
+      //     }
+      //   }
+      //   break;
+      // }
       case EventType.Timer: {
         const eventData : DmTimer = event.data as DmTimer;
         eventKey = 'timer-' + this.id;

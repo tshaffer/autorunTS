@@ -25,7 +25,8 @@ import MediaList from './mediaList';
 import SuperState from './superState';
 import VideoState from './videoState';
 import MRSSDataFeedState from './mrssDataFeedState';
-import { ContentItemType } from '../../../bsDataModel/node_modules/@brightsign/bscore';
+// import { ContentItemType } from '../../../bsDataModel/node_modules/@brightsign/bscore';
+import { ContentItemType } from '@brightsign/bscore';
 
 export class MediaZoneHSM extends ZoneHSM {
 
