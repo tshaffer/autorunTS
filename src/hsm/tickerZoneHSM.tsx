@@ -10,8 +10,8 @@ import {
   RotationType,
   TextHAlignmentType,
   TextScrollingMethodType,
-  DmColor,
-  DmRect,
+  BsColor,
+  BsRect,
 } from '@brightsign/bscore';
 
 import {
@@ -48,12 +48,12 @@ export class TickerZoneHSM extends ZoneHSM {
   alignment : TextHAlignmentType;
   scrollingMethod : TextScrollingMethodType;
   scrollSpeed : number;
-  backgroundTextColor : DmColor;
+  backgroundTextColor : BsColor;
   backgroundBitmapAssetId : string;
   font : string;
   fontSize : number;
-  foregroundTextColor : DmColor;
-  safeTextRegion : DmRect;
+  foregroundTextColor : BsColor;
+  safeTextRegion : BsRect;
   stretchBitmapFile : boolean;
   rssDataFeedItems : DataFeed[];
   includesRSSFeeds : boolean;
