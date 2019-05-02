@@ -21,7 +21,8 @@ import { bsp, BSP } from '../../app/bsp';
 
 const http = require('http');
 
-const srcDirectory = '/Users/tedshaffer/Desktop/bacInteractive/publish';
+// const srcDirectory = '/Users/tedshaffer/Desktop/bacInteractive/publish';
+const srcDirectory = '/Users/tedshaffer/Desktop/baconNonInteractive';
 
 class DesktopPlatformService {
 

@@ -4,7 +4,7 @@ import {
 
 import {
     BsDmId,
-    DmBpEventData,
+    // DmBpEventData,
     DmEvent,
     DmcEvent,
     DmcMediaState,
@@ -141,35 +141,35 @@ export default class MediaHState extends HState {
     console.log('getHState, event type is: ' + event.type);
 
     switch (event.type) {
-      case EventType.Bp: {
-        // TODO - refine
-        const eventData : DmBpEventData = event.data as DmBpEventData;
-
-        switch (eventData.buttonPanelType) {
-          case 'BP900': {
-            switch (eventData.buttonPanelIndex) {
-              case 0: {
-                eventKey = 'bp900a' + '-' + eventData.buttonNumber.toString();
-                break;                
-              }
-              case 1: {
-                eventKey = 'bp900b' + '-' + eventData.buttonNumber.toString();
-                break;                
-              }
-              default: {
-                // TODO - implement me
-                debugger;
-              }
-            }
-            break;
-          }
-          case 'BP200': {
-              // TODO - implement me
-            debugger;
-          }
-        }
-        break;
-      }
+      // case EventType.Bp: {
+      //   // TODO - refine
+      //   const eventData : DmBpEventData = event.data as DmBpEventData;
+      //
+      //   switch (eventData.buttonPanelType) {
+      //     case 'BP900': {
+      //       switch (eventData.buttonPanelIndex) {
+      //         case 0: {
+      //           eventKey = 'bp900a' + '-' + eventData.buttonNumber.toString();
+      //           break;
+      //         }
+      //         case 1: {
+      //           eventKey = 'bp900b' + '-' + eventData.buttonNumber.toString();
+      //           break;
+      //         }
+      //         default: {
+      //           // TODO - implement me
+      //           debugger;
+      //         }
+      //       }
+      //       break;
+      //     }
+      //     case 'BP200': {
+      //         // TODO - implement me
+      //       debugger;
+      //     }
+      //   }
+      //   break;
+      // }
       case EventType.Timer: {
         const eventData : DmTimer = event.data as DmTimer;
         eventKey = 'timer-' + this.id;
